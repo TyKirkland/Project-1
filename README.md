@@ -1,4 +1,4 @@
-#  Project 1... Chess! ♟
+#  Project 1... Chess! ♟ ♔♚♕♛♗♝♘♞♖♜
 ## Installation Instructions:
 No installation is necessary! Simply click on the link and you will be able to play the game through your browser!
 ## Project Description: 
