@@ -22,7 +22,9 @@ Welcome to the classic game of Chess! Using the game link provided you will be a
 9. Impliment En Passant (French for in passing): special rule that allows you to capture a pawn with another pawn under specific conditions (for more information regarding en passant please reference the chess guide in the project description section).
 10. Impliment a scrollable block that shows you in chess notation each move that was made in the game.
 11. Impliment a draw mechanic where if both players have insufficient material (cannot checkmate), both players repeat the same move 3 times in a row, or a player has no moves left to make the game immediately draws.
-12. Impliment draw and forfeit buttons where the players have the option to either accept a draw and if one of the player quits you don't have to finish out the game.
+12. Impliment draw and forfeit buttons where the players have the option to either accept a draw and if one of the players quit you don't have to finish out the game.
 13. Let the user input a name for each side so we can keep track of the win/loss/draw history and also flip sides after each game is over.
+14. Impliment the promotion system where the user can choose what piece they would like to promote their pawn to if they get it to the end of the board.
+15. An undo button which will allow the user to undo the most recent move.
 ## Technologies Used:
 JavaScript, HTML, and CSS

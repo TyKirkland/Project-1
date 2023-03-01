@@ -1,0 +1,57 @@
+body {
+    padding: 0;
+    margin: 0;
+    background: gray;
+}
+  
+div * {
+    /* setting the default for all div's before I specify */
+    padding: 0;
+    margin: 0;
+    /* border-box allows you to include the padding and border in the element's total width and height */
+    box-sizing: border-box; 
+}
+
+#turn {
+    /* setting specific dimensions to match my chess board */
+    /* you need one pixel to hang over so it pushes my 8 div down to the next line */
+    width: 401px;
+    height: 30px;
+    /* floats the element to the right of its container, being used because the element needs to be pushed to the right past the first div */
+    float: right;
+    text-align: center;
+    padding: 0 0 5px 0;
+  }
+
+#game {
+    /* 450 pixels is the exact width of each element in a row combined */
+    /* it isn't dynamic but allows the chess board to line up properly */
+    width: 450px;
+    height: 480px;
+    /* margin is centering it automatically with auto and setting a 100px gap from the top of the html */
+    margin: 100px auto;
+}
+
+.tileprefix {
+    width: 50px;
+    height: 50px;
+    /* float: left is used to sort by pushing each element to the left of the parent */
+    float: left;
+    /* used to center within the element based on my specific dimensions */
+    padding: 15px 0 0 20px;
+}
+
+.tile {
+    border: 1px solid #000;
+    width: 50px;
+    height: 50px;
+    float: left;
+    /* font-size: 30pt; */
+    padding: 0 0 0 6px;
+    /* z-index: 1; */
+}
+
+.black {
+    background: rgb(51, 51, 153);
+    /* background: black; */
+  }
