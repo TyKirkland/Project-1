@@ -272,21 +272,119 @@ let chess = {
             //these will be all the different directions they can go
             var d1,d2,d3,d4,d5,d6,d7,d8;
 
+            //this will make sure our highlighted array actually has pieces in it before being used by the togglehighlight method
+            if(chess.properties.highlighted.length != 0){
+                chess.methods.togglehighlight(chess.properties.highlighted);
+            }
 
+            switch(chess.properties.pieces[selectedpiece].type) {
+                
+                case 'w_pawn':
+                    //first we are using a conditional to see if they can move forward twice
+                    if(chess.properties.pieces[selectedpiece].moved == false){
+                        coordinates = [{x: 0, y: 1}, {x: 0, y: 2}, {x: 1, y:1}, {x: -1, y: 1}].map((value) => {
+                            return (parseInt(position.x) + parseInt(value.x)) + '_' + (parseInt(position.y) + parseInt(value.y));
+                        });
+                    }
+                    //if it has moved then we only add the one tile forward movement
+                    else if(chess.properties.pieces[selectedpiece].moved == true){
+                        coordinates = [{ x: 0, y: 1 },{ x: 1, y: 1 },{ x: -1, y: 1 }].map((value) => {
+                            return (parseInt(position.x) + parseInt(value.x)) + '_' + (parseInt(position.y) + parseInt(value.y));
+                        })
+                    }
+                    //we need to slice all our options into our options variable
+                    options = (chess.methods.options(startpoint, coordinates, chess.properties.pieces[selectedpiece].type)).slice(0);
+                    //we can then add all our options to our highlighted array
+                    chess.properties.highlighted = options.slice(0);
+                    //and then call our togglehighlight method based on all our options
+                    chess.methods.togglehighlight(options);
+            }
         },
+
+        options(startpoint, coordinates, piecetype){
+
+            //first we need to check if any of the possible coordinates are out of bounds
+            coordinates = coordinates.filter((value) => {
+                let pos = {x: 0, y: 0};
+                pos.x = parseInt(value.split('_')[0]);
+                pos.y = parseInt(value.split('_')[1]);
+
+                if(pos.x >= 1 && pos.x <= 8 && pos.y >= 1 && pos.y <= 8){
+                    return value;
+                }
+            });
+
+            //we can then run through our potential piece type's and perform the appropriate functions based on what they are
+            switch(piecetype){
+                case 'w_pawn':
+                    //we are filtering through our coordinates to check if they are movable
+                    coordinates = coordinates.filter((value) => {
+                        let sp = {x: 0, y: 0};
+                        let coordinate = value.split('_');
+
+                        sp.x = startpoint.split('_')[0];
+                        sp.y = startpoint.split('_')[1];
+
+                        //if the startpoint coordinate does not equal the potential x coordinate we have to check to see if there is a piece on it and if it is black 
+                        if(coordinate[0] != sp.x){
+                            let piecename = document.getElementById(value).getAttribute('chesspiece');
+                            //if there is a piece and it's black we can return the value as a valid coordinate option
+                            return (piecename != null && piecename.slice(0,1) == 'b');
+                        }
+                        
+                        else{
+                            //here we are checking if the 1st jump square has a piece on it
+                            let firsttile = document.getElementById(sp.x+'_'+(parseInt(sp.y)+1)).getAttribute('chesspiece');
+                            if(coordinate[1] == (parseInt(sp.y) + 2) && firsttile != 'null'){
+                                //we are stopping it from returning if tile 1/2 is not equal to null
+                            }
+                            else{
+                                let jumpabletile = document.getElementById(value).getAttribute('chesspiece');
+                                return (jumpabletile == 'null');
+                            }
+                        }
+                    });
+                    break;
+            }
+        },
+
+
         togglehighlight(options) {
-            options.forEach(function(element){
-                let color = document.getElementById(element);
-                color.toggleClass('red');
+            options.forEach((element) => {
+                if(element[1] == '_'){
+                    let color = document.getElementById(element);
+                    color.classList.toggle('red');
+                }
             })
         }
     }
 }
 
-const testclick = document.getElementById("1_7");
-testclick.addEventListener('click', (event) => {
-    //need to get the specific piece name so we have to go through the image
-    chess.methods.moveoptions(event.target.parentElement.getAttribute('chesspiece'));
-})
+// const testclick = document.getElementById("1_7");
+// testclick.addEventListener('click', (event) => {
+//     //need to get the specific piece name so we have to go through the image
+//     // chess.methods.moveoptions(event.target.parentElement.getAttribute('chesspiece'));
+//     //I have to split the id because the togglehighlight method needs an array
+//     chess.methods.togglehighlight(event.target.parentElement.id.split());
+// })
+
 
 chess.methods.gamesetup();
+
+
+//this code allows me to be able to click on a chesspiece and use the togglehighlight method on it
+const testallclicks = document.querySelectorAll(".tile");
+let allpieces = [];
+for(let each of testallclicks){
+    // console.log(each);
+    if(each.getAttribute('chesspiece') != 'null'){
+        allpieces.push(each);
+    }
+}
+allpieces.forEach((item) => {
+    item.addEventListener('click', (event) => {
+        let temporaryelement = chess.properties.pieces[event.target.parentElement.getAttribute('chesspiece')];
+        console.log(temporaryelement);
+        chess.methods.moveoptions(temporaryelement);
+    })
+})
