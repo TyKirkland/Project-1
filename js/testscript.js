@@ -272,9 +272,11 @@ let chess = {
             //these will be all the different directions they can go
             var d1,d2,d3,d4,d5,d6,d7,d8;
 
-            //this will make sure our highlighted array actually has pieces in it before being used by the togglehighlight method
+            //this will check if we already have pieces highlighted and if we do it will toggle them
             if(chess.properties.highlighted.length != 0){
                 chess.methods.togglehighlight(chess.properties.highlighted);
+                // this line is to fix a bug where it keeps adding more to the highlighted property
+                // chess.properties.highlighted = [];
             }
 
             switch(chess.properties.pieces[selectedpiece].type) {
@@ -293,7 +295,7 @@ let chess = {
                         })
                     }
                     //we need to slice all our options into our options variable
-                    options = (chess.methods.options(startpoint, coordinates, chess.properties.pieces[selectedpiece].type)).slice(0);
+                    options = (chess.methods.options(startpoint, coordinates, (chess.properties.pieces[selectedpiece].type)).slice(0));
                     //we can then add all our options to our highlighted array
                     chess.properties.highlighted = options.slice(0);
                     //and then call our togglehighlight method based on all our options
@@ -321,7 +323,6 @@ let chess = {
                     coordinates = coordinates.filter((value) => {
                         let sp = {x: 0, y: 0};
                         let coordinate = value.split('_');
-
                         sp.x = startpoint.split('_')[0];
                         sp.y = startpoint.split('_')[1];
 
@@ -329,7 +330,7 @@ let chess = {
                         if(coordinate[0] != sp.x){
                             let piecename = document.getElementById(value).getAttribute('chesspiece');
                             //if there is a piece and it's black we can return the value as a valid coordinate option
-                            return (piecename != null && piecename.slice(0,1) == 'b');
+                            return piecename != null && piecename.slice(0,1) == 'b';
                         }
                         
                         else{
@@ -340,14 +341,37 @@ let chess = {
                             }
                             else{
                                 let jumpabletile = document.getElementById(value).getAttribute('chesspiece');
-                                return (jumpabletile == 'null');
+                                return jumpabletile == 'null';
                             }
                         }
                     });
                     break;
+
+                    
             }
+
+            return coordinates;
         },
 
+        move(target){
+            
+            //we first need to get the appropriate piece name and the target tile 
+            let piece = document.getElementById(chess.properties.selectedpiece).getAttribute('chesspiece');
+            let targettile = document.getElementById(target.id);
+
+            //we then set the target tile's innerHTML to the appropriate image and update the chesspiece attribute to be the correct piece
+            targettile.innerHTML = `<img src='${chess.properties.pieces[piece].img}'>`;
+            targettile.setAttribute('chesspiece', piece);
+
+            //we then need to remove the piece from the old tile entirely
+            let oldtile = document.getElementById(chess.properties.selectedpiece);
+            oldtile.innerHTML = '';
+            oldtile.setAttribute('chesspiece', 'null');
+            
+            //and also update our Javascript object accordingly
+            chess.properties.pieces[selectedpiece].position = target.id;
+            chess.properties.pieces[selectedpiece].moved = true;
+        },
 
         togglehighlight(options) {
             options.forEach((element) => {
@@ -383,8 +407,31 @@ for(let each of testallclicks){
 }
 allpieces.forEach((item) => {
     item.addEventListener('click', (event) => {
-        let temporaryelement = chess.properties.pieces[event.target.parentElement.getAttribute('chesspiece')];
-        console.log(temporaryelement);
-        chess.methods.moveoptions(temporaryelement);
+        // console.log(event.target.parentElement.getAttribute('chesspiece'));
+        // let tempelement = chess.properties.pieces[event.target.parentElement.getAttribute('chesspiece')];
+        // tempelement = tempelement.type;
+        // console.log(tempelement);
+        // if(chess.properties.selectedpiece = ''){
+        
+        if(chess.properties.highlighted.length != 0){
+            
+        }
+
+
+
+
+            chess.properties.selectedpiece = event.target.parentElement.getAttribute('chesspiece');
+            chess.methods.moveoptions(event.target.parentElement.getAttribute('chesspiece'));
+
+        // }
+        // else if(event.target.parentElement.getAttribute('chesspiece') == 'null'){
+
+        //     // chess.methods.move();
+
+        // }
+        // console.log(chess.properties.selectedpiece);
+
+        // chess.methods.moveoptions(event.target.parentElement.getAttribute('chesspiece'));
+        
     })
 })
