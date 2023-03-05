@@ -48,7 +48,7 @@ div * {
     float: left;
     /* font-size: 30pt; */
     padding: 0 5px 0 0px;
-    z-index: 1;
+    transform: translateZ(10px);
 }
 
 .black {
@@ -57,7 +57,12 @@ div * {
   }
 
 *{
-    z-index: -1;
+    transform: translateZ(-10px);
+}
+
+img{
+    /* this makes it so you click through the image into the parent, very important for the game logic */
+    pointer-events: none;
 }
 
 .red{

@@ -276,7 +276,7 @@ let chess = {
             if(chess.properties.highlighted.length != 0){
                 chess.methods.togglehighlight(chess.properties.highlighted);
                 // this line is to fix a bug where it keeps adding more to the highlighted property
-                // chess.properties.highlighted = [];
+                chess.properties.highlighted.length = 0;
             }
 
             switch(chess.properties.pieces[selectedpiece].type) {
@@ -369,8 +369,38 @@ let chess = {
             oldtile.setAttribute('chesspiece', 'null');
             
             //and also update our Javascript object accordingly
-            chess.properties.pieces[selectedpiece].position = target.id;
-            chess.properties.pieces[selectedpiece].moved = true;
+            chess.properties.pieces[piece].position = target.id;
+            chess.properties.pieces[piece].moved = true;
+        },
+
+        endturn() {
+            if(chess.properties.turn == 'w'){
+                //here we are changing whose turn it is to black
+                chess.properties.turn = 'b';
+
+                //and then toggling all the highlighted squares before setting the highlighted array back to nothing
+                chess.methods.togglehighlight(chess.properties.highlighted);
+                chess.properties.highlighted.length = 0;
+
+                //we then also need to set the selected piece back to ''
+                chess.properties.selectedpiece = '';
+
+                //we then need to change our turn text to the opposite colors turn
+                let turndisplay = document.getElementById('turn');
+                turndisplay.innerText = "Black's Turn";
+            }
+            //same as above but inverse
+            else if(chess.properties.turn = 'b'){
+                chess.properties.turn = 'w';
+
+                chess.methods.togglehighlight(chess.properties.highlighted);
+                chess.properties.highlighted.length = 0;
+
+                chess.properties.selectedpiece = '';
+
+                let turndisplay = document.getElementById('turn');
+                turndisplay.innerText = "White's Turn";
+            }
         },
 
         togglehighlight(options) {
@@ -397,41 +427,91 @@ chess.methods.gamesetup();
 
 
 //this code allows me to be able to click on a chesspiece and use the togglehighlight method on it
-const testallclicks = document.querySelectorAll(".tile");
-let allpieces = [];
-for(let each of testallclicks){
-    // console.log(each);
-    if(each.getAttribute('chesspiece') != 'null'){
-        allpieces.push(each);
-    }
-}
-allpieces.forEach((item) => {
-    item.addEventListener('click', (event) => {
-        // console.log(event.target.parentElement.getAttribute('chesspiece'));
-        // let tempelement = chess.properties.pieces[event.target.parentElement.getAttribute('chesspiece')];
-        // tempelement = tempelement.type;
-        // console.log(tempelement);
-        // if(chess.properties.selectedpiece = ''){
-        
-        if(chess.properties.highlighted.length != 0){
-            
+const tileclicks = document.querySelectorAll(".tile");
+
+tileclicks.forEach((tile) => {
+    tile.addEventListener('click', (event) => {
+
+        //need to scope this globally because I use it in my move function to update data
+        var selectedpiece = {
+            name: '',
+            id: chess.properties.selectedpiece
+        };
+
+        //checking to see if we are selecting a fresh piece or moving/capturing later on
+        if(chess.properties.selectedpiece == ''){
+            selectedpiece.name = document.getElementById(event.target.id)
+        }
+        else{
+            selectedpiece.name = document.getElementById(chess.properties.selectedpiece).getAttribute('chesspiece');
         }
 
+        var target = {
+            name: event.target.getAttribute('chesspiece'),
+            id: event.target.id
+        };
 
+        //we want to check to see if the selected potential square to move to is an actual option
+        let potentialtile = chess.properties.highlighted.some((item) => {
+            return item == event.target.id;
+        });
 
-
-            chess.properties.selectedpiece = event.target.parentElement.getAttribute('chesspiece');
-            chess.methods.moveoptions(event.target.parentElement.getAttribute('chesspiece'));
-
-        // }
-        // else if(event.target.parentElement.getAttribute('chesspiece') == 'null'){
-
-        //     // chess.methods.move();
-
-        // }
-        // console.log(chess.properties.selectedpiece);
-
-        // chess.methods.moveoptions(event.target.parentElement.getAttribute('chesspiece'));
         
+        //here we want to show our options if there is no selected piece
+        if(chess.properties.selectedpiece == '' && target.name.slice(0,1) == chess.properties.turn){
+            //we also need to set the selectedpiece as the now clicked on piece
+            chess.properties.selectedpiece = event.target.id;
+            chess.methods.moveoptions(event.target.getAttribute('chesspiece'));
+        }
+        //here we are deselecting the available tiles if the user pushes the already selected tile
+        else if(chess.properties.selectedpiece == event.target.id){
+            chess.methods.togglehighlight(chess.properties.highlighted);
+            chess.properties.highlighted.length = 0;
+            chess.properties.selectedpiece = '';
+        }
+        //here we want to disable all our highlighted squares and highlight the new ones when a different piece is clicked
+        else if(chess.properties.selectedpiece != '' && target.name.slice(0,1) == chess.properties.turn){
+            chess.properties.selectedpiece = event.target.id;
+            chess.methods.moveoptions(event.target.getAttribute('chesspiece'));
+        }
+        //if there already is a selected piece but not a piece on the target square we want to run our move method
+        else if(chess.properties.selectedpiece != '' && target.name == 'null' && potentialtile == true){
+            chess.methods.move(target);
+            chess.methods.endturn();
+        }
     })
 })
+
+
+// tileclicks.forEach((item) => {
+// item.addEventListener('click', (event) => {
+    
+//         if(event.target.getAttribute('chesspiece') == 'null'){
+
+            
+//         }
+
+
+
+//         if(chess.properties.highlighted.length != 0){
+            
+//         }
+
+
+
+
+//             chess.properties.selectedpiece = event.target.parentElement.getAttribute('chesspiece');
+//             chess.methods.moveoptions(event.target.parentElement.getAttribute('chesspiece'));
+
+//         // }
+//         // else if(event.target.parentElement.getAttribute('chesspiece') == 'null'){
+
+//         //     // chess.methods.move();
+
+//         // }
+//         // console.log(chess.properties.selectedpiece);
+
+//         // chess.methods.moveoptions(event.target.parentElement.getAttribute('chesspiece'));
+        
+//     }-------------------------------------------+)
+// })
