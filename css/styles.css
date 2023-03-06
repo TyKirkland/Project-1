@@ -48,16 +48,11 @@ div * {
     float: left;
     /* font-size: 30pt; */
     padding: 0 5px 0 0px;
-    transform: translateZ(10px);
 }
 
 .black {
     background: rgb(108, 138, 81);
     /* background: black; */
-  }
-
-*{
-    transform: translateZ(-10px);
 }
 
 img{

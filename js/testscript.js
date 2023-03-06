@@ -284,13 +284,13 @@ let chess = {
                 case 'w_pawn':
                     //first we are using a conditional to see if they can move forward twice
                     if(chess.properties.pieces[selectedpiece].moved == false){
-                        coordinates = [{x: 0, y: 1}, {x: 0, y: 2}, {x: 1, y:1}, {x: -1, y: 1}].map((value) => {
+                        coordinates = [{x: 0, y: 1}, {x: 0, y: 2}, {x: 1, y: 1}, {x: -1, y: 1}].map((value) => {
                             return (parseInt(position.x) + parseInt(value.x)) + '_' + (parseInt(position.y) + parseInt(value.y));
                         });
                     }
                     //if it has moved then we only add the one tile forward movement
                     else if(chess.properties.pieces[selectedpiece].moved == true){
-                        coordinates = [{ x: 0, y: 1 },{ x: 1, y: 1 },{ x: -1, y: 1 }].map((value) => {
+                        coordinates = [{ x: 0, y: 1 },{ x: 1, y: 1 },{ x: -1, y: 1}].map((value) => {
                             return (parseInt(position.x) + parseInt(value.x)) + '_' + (parseInt(position.y) + parseInt(value.y));
                         })
                     }
@@ -300,6 +300,176 @@ let chess = {
                     chess.properties.highlighted = options.slice(0);
                     //and then call our togglehighlight method based on all our options
                     chess.methods.togglehighlight(options);
+
+                    break;
+                
+                case 'b_pawn':
+                    //same as above but inverse
+                    if(chess.properties.pieces[selectedpiece].moved == false){
+                        coordinates = [{x: 0, y: -1}, {x: 0, y: -2}, {x: 1, y:-1}, {x: -1, y: -1}].map((value) => {
+                            return (parseInt(position.x) + parseInt(value.x)) + '_' + (parseInt(position.y) + parseInt(value.y));
+                        });
+                    }
+                    else if(chess.properties.pieces[selectedpiece].moved == true){
+                        coordinates = [{x: 0, y: -1}, {x: 1, y: -1}, {x: -1, y: -1}].map((value) => {
+                            return (parseInt(position.x) + parseInt(value.x)) + '_' + (parseInt(position.y) + parseInt(value.y));
+                        });
+                    }
+
+                    options = (chess.methods.options(startpoint, coordinates, (chess.properties.pieces[selectedpiece].type)).slice(0));
+                    chess.properties.highlighted = options.slice(0);
+                    chess.methods.togglehighlight(options);
+
+                    break;
+
+                case 'w_bishop':
+                    
+                    d1 = chess.methods.directionoptions(position, [{x: 1, y: 1},{x: 2, y: 2},{x: 3, y: 3},{x: 4, y: 4},{x: 5, y: 5},{x: 6, y: 6},{x: 7, y: 7}]);
+                    d2 = chess.methods.directionoptions(position, [{x: 1, y: -1},{x: 2, y: -2},{x: 3, y: -3},{x: 4, y: -4},{x: 5, y: -5},{x: 6, y: -6},{x: 7, y: -7}]);
+                    d3 = chess.methods.directionoptions(position, [{x: -1, y: 1},{x: -2, y: 2},{x: -3, y: 3},{x: -4, y: 4},{x: -5, y: 5},{x: -6, y: 6},{x: -7, y: 7}]);
+                    d4 = chess.methods.directionoptions(position, [{x: -1, y: -1},{x: -2, y: -2},{x: -3, y: -3},{x: -4, y: -4},{x: -5, y: -5},{x: -6, y: -6},{x: -7, y: -7}]);
+
+                    //concat combines the arrays together
+                    coordinates = d1.concat(d2).concat(d3).concat(d4);
+
+                    options = coordinates;
+                    chess.properties.highlighted = options.slice(0);
+                    chess.methods.togglehighlight(options);
+
+                    break;
+                
+                case 'b_bishop':
+                    
+                    d1 = chess.methods.directionoptions(position, [{x: 1, y: 1},{x: 2, y: 2},{x: 3, y: 3},{x: 4, y: 4},{x: 5, y: 5},{x: 6, y: 6},{x: 7, y: 7}]);
+                    d2 = chess.methods.directionoptions(position, [{x: 1, y: -1},{x: 2, y: -2},{x: 3, y: -3},{x: 4, y: -4},{x: 5, y: -5},{x: 6, y: -6},{x: 7, y: -7}]);
+                    d3 = chess.methods.directionoptions(position, [{x: -1, y: 1},{x: -2, y: 2},{x: -3, y: 3},{x: -4, y: 4},{x: -5, y: 5},{x: -6, y: 6},{x: -7, y: 7}]);
+                    d4 = chess.methods.directionoptions(position, [{x: -1, y: -1},{x: -2, y: -2},{x: -3, y: -3},{x: -4, y: -4},{x: -5, y: -5},{x: -6, y: -6},{x: -7, y: -7}]);
+
+                    //concat combines the arrays together
+                    coordinates = d1.concat(d2).concat(d3).concat(d4);
+
+                    options = coordinates.slice(0);
+                    chess.properties.highlighted = options.slice(0);
+                    chess.methods.togglehighlight(options);
+
+                    break;
+                
+                case 'w_rook':
+
+                    d1 = chess.methods.directionoptions(position, [{x: 1, y: 0},{x: 2, y: 0},{x: 3, y: 0},{x: 4, y: 0},{x: 5, y: 0},{x: 6, y: 0},{x: 7, y: 0}]);
+                    d2 = chess.methods.directionoptions(position, [{x: 0, y: 1},{x: 0, y: 2},{x: 0, y: 3},{x: 0, y: 4},{x: 0, y: 5},{x: 0, y: 6},{x: 0, y: 7}]);
+                    d3 = chess.methods.directionoptions(position, [{x: -1, y: 0},{x: -2, y: 0},{x: -3, y: 0},{x: -4, y: 0},{x: -5, y: 0},{x: -6, y: 0},{x: -7, y: 0}]);
+                    d4 = chess.methods.directionoptions(position, [{x: 0, y: -1},{x: 0, y: -2},{x: 0, y: -3},{x: 0, y: -4},{x: 0, y: -5},{x: 0, y: -6},{x: 0, y: -7}]);
+
+                    coordinates = d1.concat(d2).concat(d3).concat(d4);
+
+                    options = coordinates.slice(0);
+                    chess.properties.highlighted = options.slice(0);
+                    chess.methods.togglehighlight(options);
+
+                    break;
+                
+                case 'b_rook':
+
+                    d1 = chess.methods.directionoptions(position, [{x: 1, y: 0},{x: 2, y: 0},{x: 3, y: 0},{x: 4, y: 0},{x: 5, y: 0},{x: 6, y: 0},{x: 7, y: 0}]);
+                    d2 = chess.methods.directionoptions(position, [{x: 0, y: 1},{x: 0, y: 2},{x: 0, y: 3},{x: 0, y: 4},{x: 0, y: 5},{x: 0, y: 6},{x: 0, y: 7}]);
+                    d3 = chess.methods.directionoptions(position, [{x: -1, y: 0},{x: -2, y: 0},{x: -3, y: 0},{x: -4, y: 0},{x: -5, y: 0},{x: -6, y: 0},{x: -7, y: 0}]);
+                    d4 = chess.methods.directionoptions(position, [{x: 0, y: -1},{x: 0, y: -2},{x: 0, y: -3},{x: 0, y: -4},{x: 0, y: -5},{x: 0, y: -6},{x: 0, y: -7}]);
+    
+                    coordinates = d1.concat(d2).concat(d3).concat(d4);
+    
+                    options = coordinates.slice(0);
+                    chess.properties.highlighted = options.slice(0);
+                    chess.methods.togglehighlight(options);
+    
+                    break;
+
+                case 'w_queen':
+
+                    d1 = chess.methods.directionoptions(position, [{x: 1, y: 0},{x: 2, y: 0},{x: 3, y: 0},{x: 4, y: 0},{x: 5, y: 0},{x: 6, y: 0},{x: 7, y: 0}]);
+                    d2 = chess.methods.directionoptions(position, [{x: 0, y: 1},{x: 0, y: 2},{x: 0, y: 3},{x: 0, y: 4},{x: 0, y: 5},{x: 0, y: 6},{x: 0, y: 7}]);
+                    d3 = chess.methods.directionoptions(position, [{x: -1, y: 0},{x: -2, y: 0},{x: -3, y: 0},{x: -4, y: 0},{x: -5, y: 0},{x: -6, y: 0},{x: -7, y: 0}]);
+                    d4 = chess.methods.directionoptions(position, [{x: 0, y: -1},{x: 0, y: -2},{x: 0, y: -3},{x: 0, y: -4},{x: 0, y: -5},{x: 0, y: -6},{x: 0, y: -7}]);
+                    d5 = chess.methods.directionoptions(position, [{x: 1, y: 1},{x: 2, y: 2},{x: 3, y: 3},{x: 4, y: 4},{x: 5, y: 5},{x: 6, y: 6},{x: 7, y: 7}]);
+                    d6 = chess.methods.directionoptions(position, [{x: 1, y: -1},{x: 2, y: -2},{x: 3, y: -3},{x: 4, y: -4},{x: 5, y: -5},{x: 6, y: -6},{x: 7, y: -7}]);
+                    d7 = chess.methods.directionoptions(position, [{x: -1, y: 1},{x: -2, y: 2},{x: -3, y: 3},{x: -4, y: 4},{x: -5, y: 5},{x: -6, y: 6},{x: -7, y: 7}]);
+                    d8 = chess.methods.directionoptions(position, [{x: -1, y: -1},{x: -2, y: -2},{x: -3, y: -3},{x: -4, y: -4},{x: -5, y: -5},{x: -6, y: -6},{x: -7, y: -7}]);
+
+                    coordinates = d1.concat(d2).concat(d3).concat(d4).concat(d5).concat(d6).concat(d7).concat(d8);
+
+                    options = coordinates.slice(0);
+                    chess.properties.highlighted = options.slice(0);
+                    chess.methods.togglehighlight(options);
+
+                    break;
+
+                case 'b_queen':
+
+                    d1 = chess.methods.directionoptions(position, [{x: 1, y: 0},{x: 2, y: 0},{x: 3, y: 0},{x: 4, y: 0},{x: 5, y: 0},{x: 6, y: 0},{x: 7, y: 0}]);
+                    d2 = chess.methods.directionoptions(position, [{x: 0, y: 1},{x: 0, y: 2},{x: 0, y: 3},{x: 0, y: 4},{x: 0, y: 5},{x: 0, y: 6},{x: 0, y: 7}]);
+                    d3 = chess.methods.directionoptions(position, [{x: -1, y: 0},{x: -2, y: 0},{x: -3, y: 0},{x: -4, y: 0},{x: -5, y: 0},{x: -6, y: 0},{x: -7, y: 0}]);
+                    d4 = chess.methods.directionoptions(position, [{x: 0, y: -1},{x: 0, y: -2},{x: 0, y: -3},{x: 0, y: -4},{x: 0, y: -5},{x: 0, y: -6},{x: 0, y: -7}]);
+                    d5 = chess.methods.directionoptions(position, [{x: 1, y: 1},{x: 2, y: 2},{x: 3, y: 3},{x: 4, y: 4},{x: 5, y: 5},{x: 6, y: 6},{x: 7, y: 7}]);
+                    d6 = chess.methods.directionoptions(position, [{x: 1, y: -1},{x: 2, y: -2},{x: 3, y: -3},{x: 4, y: -4},{x: 5, y: -5},{x: 6, y: -6},{x: 7, y: -7}]);
+                    d7 = chess.methods.directionoptions(position, [{x: -1, y: 1},{x: -2, y: 2},{x: -3, y: 3},{x: -4, y: 4},{x: -5, y: 5},{x: -6, y: 6},{x: -7, y: 7}]);
+                    d8 = chess.methods.directionoptions(position, [{x: -1, y: -1},{x: -2, y: -2},{x: -3, y: -3},{x: -4, y: -4},{x: -5, y: -5},{x: -6, y: -6},{x: -7, y: -7}]);
+
+                    coordinates = d1.concat(d2).concat(d3).concat(d4).concat(d5).concat(d6).concat(d7).concat(d8);
+
+                    options = coordinates.slice(0);
+                    chess.properties.highlighted = options.slice(0);
+                    chess.methods.togglehighlight(options);
+
+                    break;
+
+                case 'w_knight':
+
+                    coordinates = [{ x: -1, y: 2 },{ x: 1, y: 2 },{ x: 1, y: -2 },{ x: -1, y: -2 },{ x: 2, y: 1 },{ x: 2, y: -1 },{ x: -2, y: -1 },{ x: -2, y: 1 }].map((value) => {
+                        return (parseInt(position.x) + parseInt(value.x)) + '_' + (parseInt(position.y) + parseInt(value.y));
+                    })
+
+                    options = (chess.methods.options(startpoint, coordinates, (chess.properties.pieces[selectedpiece].type))).slice(0);
+                    chess.properties.highlighted = options.slice(0);
+                    chess.methods.togglehighlight(options);
+
+                    break;
+
+                case 'b_knight':
+
+                    coordinates = [{ x: -1, y: 2 },{ x: 1, y: 2 },{ x: 1, y: -2 },{ x: -1, y: -2 },{ x: 2, y: 1 },{ x: 2, y: -1 },{ x: -2, y: -1 },{ x: -2, y: 1 }].map((value) => {
+                        return (parseInt(position.x) + parseInt(value.x)) + '_' + (parseInt(position.y) + parseInt(value.y));
+                    })
+
+                    options = (chess.methods.options(startpoint, coordinates, (chess.properties.pieces[selectedpiece].type))).slice(0);
+                    chess.properties.highlighted = options.slice(0);
+                    chess.methods.togglehighlight(options);
+
+                    break;
+
+                case 'w_king':
+
+                    coordinates = [{ x: 1, y: 1 },{ x: 1, y: 0 },{ x: 1, y: -1 },{ x: 0, y: -1 },{ x: -1, y: -1 },{ x: -1, y: 0 },{ x: -1, y: 1 },{ x: 0, y: 1 }].map((value) => {
+                        return (parseInt(position.x) + parseInt(value.x)) + '_' + (parseInt(position.y) + parseInt(value.y));
+                    });
+
+                    options = (chess.methods.options(startpoint, coordinates, (chess.properties.pieces[selectedpiece].type))).slice(0);
+                    chess.properties.highlighted = options.slice(0);
+                    chess.methods.togglehighlight(options);
+
+                    break;
+
+                case 'b_king':
+
+                    coordinates = [{ x: 1, y: 1 },{ x: 1, y: 0 },{ x: 1, y: -1 },{ x: 0, y: -1 },{ x: -1, y: -1 },{ x: -1, y: 0 },{ x: -1, y: 1 },{ x: 0, y: 1 }].map((value) => {
+                        return (parseInt(position.x) + parseInt(value.x)) + '_' + (parseInt(position.y) + parseInt(value.y));
+                    });
+
+                    options = (chess.methods.options(startpoint, coordinates, (chess.properties.pieces[selectedpiece].type))).slice(0);
+                    chess.properties.highlighted = options.slice(0);
+                    chess.methods.togglehighlight(options);
+
+                    break;
+
             }
         },
 
@@ -346,10 +516,112 @@ let chess = {
                         }
                     });
                     break;
-
                     
+                case 'b_pawn':
+                    //same as above but inverse
+                    coordinates = coordinates.filter((value) => {
+                        let sp = {x: 0, y: 0};
+                        let coordinate = value.split('_');
+                        sp.x = startpoint.split('_')[0];
+                        sp.y = startpoint.split('_')[1];
+
+                        //if the startpoint coordinate does not equal the potential x coordinate we have to check to see if there is a piece on it and if it is black 
+                        if(coordinate[0] != sp.x){
+                            let piecename = document.getElementById(value).getAttribute('chesspiece');
+                            //if there is a piece and it's white we can return the value as a valid coordinate option
+                            return piecename != null && piecename.slice(0,1) == 'w';
+                        }
+                        
+                        else{
+                            //here we are checking if the 1st jump square has a piece on it
+                            let firsttile = document.getElementById(sp.x+'_'+(parseInt(sp.y)-1)).getAttribute('chesspiece');
+                            if(coordinate[1] == (parseInt(sp.y) - 2) && firsttile != 'null'){
+                                //we are stopping it from returning if tile 1/2 is not equal to null
+                            }
+                            else{
+                                let jumpabletile = document.getElementById(value).getAttribute('chesspiece');
+                                return jumpabletile == 'null';
+                            }
+                        }
+                    });
+                    break;
+
+                case 'w_knight':
+
+                    coordinates = coordinates.filter((value) => {
+                        return (document.getElementById(value).getAttribute('chesspiece') == 'null' || document.getElementById(value).getAttribute('chesspiece').slice(0,1) == 'b');
+                    })
+                    break;
+
+                case 'b_knight':
+
+                    coordinates = coordinates.filter((value) => {
+                        return (document.getElementById(value).getAttribute('chesspiece') == 'null' || document.getElementById(value).getAttribute('chesspiece').slice(0,1) == 'w');
+                    })
+                    break;
+
+                case 'w_king':
+
+                    coordinates = coordinates.filter((value) => {
+                        return (document.getElementById(value).getAttribute('chesspiece') == 'null' || document.getElementById(value).getAttribute('chesspiece').slice(0,1) == 'b');
+                    });
+                    break;
+                
+                case 'b_king':
+
+                    coordinates = coordinates.filter((value) => {
+                        return (document.getElementById(value).getAttribute('chesspiece') == 'null' || document.getElementById(value).getAttribute('chesspiece').slice(0,1) == 'w');
+                    });
+                    break;
             }
 
+            return coordinates;
+        },
+
+        directionoptions(position, coordinates){
+
+            //we need to initialize a stop variable which will stop the coordinates from continuing once we reach a piece
+            let stop = false;
+
+            //first we are turning all the potential coordinates into the appropriate tile coordinates
+            coordinates = coordinates.map((value) => {
+                return (parseInt(position.x) + parseInt(value.x)) + '_' + (parseInt(position.y) + parseInt(value.y));
+            });
+
+            //then we are removing all the invalid tile coordinates
+            coordinates = coordinates.filter((value) => {
+                let pos = {
+                    x: 0,
+                    y: 0
+                }
+                pos.x = parseInt(value.split('_')[0]);
+                pos.y = parseInt(value.split('_')[1]);
+                
+                if(pos.x >= 1 && pos.x <= 8 && pos.y >= 1 && pos.y <= 8){
+                    return value;
+                }
+            })
+
+            //then we are stopping the direction once the line of sight is broken
+            coordinates = coordinates.filter((value) => {
+                if(stop == false){
+                    //these conditionals keep the direction going until it reaches either the same type of piece or an enemy piece
+                    //if the tile is empty return the value as a suitable tile
+                    if(document.getElementById(value).getAttribute('chesspiece') == 'null'){
+                        return value;
+                    }
+                    //if the tile has the same color piece on it don't return the tile but stop the direction
+                    else if(document.getElementById(value).getAttribute('chesspiece').slice(0,1) == chess.properties.turn){
+                        stop = true;
+                    }
+                    //if the tile has a different color piece on it and is not empty you return the value and also stop the direction
+                    else{
+                        stop = true;
+                        return value;
+                    }
+                }  
+            })
+            //finally don't forget to return all the now finalized coordinates back
             return coordinates;
         },
 
@@ -371,6 +643,32 @@ let chess = {
             //and also update our Javascript object accordingly
             chess.properties.pieces[piece].position = target.id;
             chess.properties.pieces[piece].moved = true;
+        },
+
+        capture(target){
+            //first we need to create a variable which will hold our already selected piece's name and tile id
+            let selectedpiece = {
+                name: document.getElementById(chess.properties.selectedpiece).getAttribute('chesspiece'),
+                //remember the selected piece in my chess object is just the square name (1_8)
+                id: chess.properties.selectedpiece
+            };
+
+            //then we need to update our new cell with the correct picture and attribute
+            let targettile = document.getElementById(target.id);
+            targettile.innerHTML = `<img src='${chess.properties.pieces[selectedpiece.name].img}'>`;
+            targettile.setAttribute('chesspiece', selectedpiece.name);
+
+            //then replace the cell we moved from's information 
+            let oldtile = document.getElementById(selectedpiece.id);
+            oldtile.innerHTML = '';
+            oldtile.setAttribute('chesspiece', 'null');
+
+            //then we need to update our object information accordingly
+            chess.properties.pieces[selectedpiece.name].position = target.id;
+            chess.properties.pieces[selectedpiece.name].moved = true;
+            
+            chess.properties.pieces[target.name].captured = true;
+
         },
 
         endturn() {
@@ -414,19 +712,9 @@ let chess = {
     }
 }
 
-// const testclick = document.getElementById("1_7");
-// testclick.addEventListener('click', (event) => {
-//     //need to get the specific piece name so we have to go through the image
-//     // chess.methods.moveoptions(event.target.parentElement.getAttribute('chesspiece'));
-//     //I have to split the id because the togglehighlight method needs an array
-//     chess.methods.togglehighlight(event.target.parentElement.id.split());
-// })
-
 
 chess.methods.gamesetup();
 
-
-//this code allows me to be able to click on a chesspiece and use the togglehighlight method on it
 const tileclicks = document.querySelectorAll(".tile");
 
 tileclicks.forEach((tile) => {
@@ -479,39 +767,16 @@ tileclicks.forEach((tile) => {
             chess.methods.move(target);
             chess.methods.endturn();
         }
+        //if the user clicks on a square that is not a potential tile to jump to after selecting a piece this will stop highlighting all the squares and reset our selected piece data
+        else if(potentialtile == false){
+            chess.methods.togglehighlight(chess.properties.highlighted);
+            chess.properties.highlighted.length = 0;
+            chess.properties.selectedpiece = '';
+        }
+        //here we are checking if we have already selected a piece, the target's name is a piece and if it is a potential tile to jump to before capturing
+        else if(chess.properties.selectedpiece != '' && target.name != 'null' && potentialtile == true){
+            chess.methods.capture(target);
+            chess.methods.endturn();
+        }
     })
 })
-
-
-// tileclicks.forEach((item) => {
-// item.addEventListener('click', (event) => {
-    
-//         if(event.target.getAttribute('chesspiece') == 'null'){
-
-            
-//         }
-
-
-
-//         if(chess.properties.highlighted.length != 0){
-            
-//         }
-
-
-
-
-//             chess.properties.selectedpiece = event.target.parentElement.getAttribute('chesspiece');
-//             chess.methods.moveoptions(event.target.parentElement.getAttribute('chesspiece'));
-
-//         // }
-//         // else if(event.target.parentElement.getAttribute('chesspiece') == 'null'){
-
-//         //     // chess.methods.move();
-
-//         // }
-//         // console.log(chess.properties.selectedpiece);
-
-//         // chess.methods.moveoptions(event.target.parentElement.getAttribute('chesspiece'));
-        
-//     }-------------------------------------------+)
-// })
