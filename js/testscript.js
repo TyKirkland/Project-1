@@ -4,6 +4,10 @@ let chess = {
         turn: 'w',
         selectedpiece: '',
         highlighted: [],
+        allWhitePieceTiles: [],
+        allBlackPieceTiles: [],
+        potentialWhiteMoves: [],
+        potentialBlackMoves: [],
         pieces: {
             w_pawn1: {
                 position: '1_2',
@@ -452,6 +456,14 @@ let chess = {
                         return (parseInt(position.x) + parseInt(value.x)) + '_' + (parseInt(position.y) + parseInt(value.y));
                     });
 
+                    if(chess.properties.pieces['w_king'].moved == false && chess.properties.pieces['w_rook2'].moved == false && document.getElementById('7_1').getAttribute('chesspiece') == 'null' && document.getElementById('6_1').getAttribute('chesspiece') == 'null' && chess.properties.potentialBlackMoves.includes('8_1') == false && chess.properties.potentialBlackMoves.includes('7_1') == false && chess.properties.potentialBlackMoves.includes('6_1') == false && chess.properties.potentialBlackMoves.includes('5_1') == false){
+                        coordinates.push('7_1');
+                    }
+
+                    if(chess.properties.pieces['w_king'].moved == false && chess.properties.pieces['w_rook1'].moved == false && document.getElementById('2_1').getAttribute('chesspiece') == 'null' && document.getElementById('3_1').getAttribute('chesspiece') == 'null' && document.getElementById('4_1').getAttribute('chesspiece') == 'null' && chess.properties.potentialBlackMoves.includes('1_1') == false && chess.properties.potentialBlackMoves.includes('2_1') == false && chess.properties.potentialBlackMoves.includes('3_1') == false && chess.properties.potentialBlackMoves.includes('4_1') == false && chess.properties.potentialBlackMoves.includes('5_1') == false){
+                        coordinates.push('3_1');
+                    }
+
                     options = (chess.methods.options(startpoint, coordinates, (chess.properties.pieces[selectedpiece].type))).slice(0);
                     chess.properties.highlighted = options.slice(0);
                     chess.methods.togglehighlight(options);
@@ -464,6 +476,14 @@ let chess = {
                         return (parseInt(position.x) + parseInt(value.x)) + '_' + (parseInt(position.y) + parseInt(value.y));
                     });
 
+                    if(chess.properties.pieces['b_king'].moved == false && chess.properties.pieces['b_rook2'].moved == false && document.getElementById('7_8').getAttribute('chesspiece') == 'null' && document.getElementById('6_8').getAttribute('chesspiece') == 'null' && chess.properties.potentialWhiteMoves.includes('8_8') == false && chess.properties.potentialWhiteMoves.includes('7_8') == false && chess.properties.potentialWhiteMoves.includes('6_8') == false && chess.properties.potentialWhiteMoves.includes('5_8') == false){
+                        coordinates.push('7_8');
+                    }
+
+                    if(chess.properties.pieces['b_king'].moved == false && chess.properties.pieces['b_rook1'].moved == false && document.getElementById('2_8').getAttribute('chesspiece') == 'null' && document.getElementById('3_8').getAttribute('chesspiece') == 'null' && document.getElementById('4_8').getAttribute('chesspiece') == 'null' && chess.properties.potentialWhiteMoves.includes('1_8') == false && chess.properties.potentialWhiteMoves.includes('2_8') == false && chess.properties.potentialWhiteMoves.includes('3_8') == false && chess.properties.potentialWhiteMoves.includes('4_8') == false && chess.properties.potentialWhiteMoves.includes('5_8') == false){
+                        coordinates.push('3_8');
+                    }
+
                     options = (chess.methods.options(startpoint, coordinates, (chess.properties.pieces[selectedpiece].type))).slice(0);
                     chess.properties.highlighted = options.slice(0);
                     chess.methods.togglehighlight(options);
@@ -471,6 +491,7 @@ let chess = {
                     break;
 
             }
+            return options;
         },
 
         options(startpoint, coordinates, piecetype){
@@ -631,6 +652,62 @@ let chess = {
             let piece = document.getElementById(chess.properties.selectedpiece).getAttribute('chesspiece');
             let targettile = document.getElementById(target.id);
 
+            //here I am setting specific conditions for each direction you can castle
+            if(target.id == '7_1' && piece == 'w_king'){
+                //since we are already fully moving the king to the appropriate tile we just need to move the rook
+                //first we delete it from our old tile
+                let oldRookTile = document.getElementById('8_1');
+                oldRookTile.innerHTML = '';
+                oldRookTile.setAttribute('chesspiece', 'null');
+
+                //then add both the image and attribute to the new tile
+                document.getElementById('6_1').innerHTML = `<img src='${chess.properties.pieces['w_rook2'].img}'>`;
+                document.getElementById('6_1').setAttribute('chesspiece', 'w_rook2');
+
+                //after updating the HTML we need to update our Javascript object
+                chess.properties.pieces['w_rook2'].position = '6_1';
+                chess.properties.pieces['w_rook2'].moved = true;
+            }
+
+            //same as above but for long side castling
+            if(target.id == '3_1' && piece == 'w_king'){
+                let oldRookTile = document.getElementById('1_1');
+                oldRookTile.innerHTML = '';
+                oldRookTile.setAttribute('chesspiece', 'null');
+
+                document.getElementById('4_1').innerHTML = `<img src='${chess.properties.pieces['w_rook1'].img}'>`;
+                document.getElementById('4_1').setAttribute('chesspiece', 'w_rook1');
+
+                chess.properties.pieces['w_rook1'].position = '4_1';
+                chess.properties.pieces['w_rook1'].moved = true;
+            }
+
+            //same as above but with the black king long castling
+            if(target.id == '3_8' && piece == 'b_king'){
+                let oldRookTile = document.getElementById('1_8');
+                oldRookTile.innerHTML = '';
+                oldRookTile.setAttribute('chesspiece', 'null');
+
+                document.getElementById('4_8').innerHTML = `<img src='${chess.properties.pieces['b_rook1'].img}'>`;
+                document.getElementById('4_8').setAttribute('chesspiece', 'b_rook1');
+
+                chess.properties.pieces['b_rook1'].position = '4_8';
+                chess.properties.pieces['b_rook1'].moved = true;
+            }
+
+            //same as above but with black king short castling
+            if(target.id == '7_8' && piece == 'b_king'){
+                let oldRookTile = document.getElementById('8_8');
+                oldRookTile.innerHTML = '';
+                oldRookTile.setAttribute('chesspiece', 'null');
+
+                document.getElementById('6_8').innerHTML = `<img src='${chess.properties.pieces['b_rook2'].img}'>`;
+                document.getElementById('6_8').setAttribute('chesspiece', 'b_rook2');
+
+                chess.properties.pieces['b_rook2'].position = '6_8';
+                chess.properties.pieces['b_rook2'].moved = true;
+            }
+
             //we then set the target tile's innerHTML to the appropriate image and update the chesspiece attribute to be the correct piece
             targettile.innerHTML = `<img src='${chess.properties.pieces[piece].img}'>`;
             targettile.setAttribute('chesspiece', piece);
@@ -672,6 +749,45 @@ let chess = {
         },
 
         endturn() {
+            //here I am trying to store all the pieces and their potential moves into an array so I can check if certain tiles are being attacked for castling and king moves/checkmate            let allTiles = document.querySelectorAll('.tile');
+            let allTiles = document.querySelectorAll('.tile');
+            let tileArray = [];
+            for(let tile of allTiles){
+                tileArray.push(tile);
+            }
+
+            chess.properties.potentialWhiteMoves.length = 0;
+            chess.properties.potentialBlackMoves.length = 0;
+
+            //here I am first filtering through each tile to find the ones with white pieces
+            let allWhitePieces = tileArray.filter((item) => {
+                return item.getAttribute('chesspiece').slice(0,1) == 'w';
+            }).map((item) => {
+                //then I am mapping them to change each item to it's id value
+                return item.getAttribute('chesspiece').slice(0);
+            })
+            //exact same as above but opposite
+            let allBlackPieces = tileArray.filter((item) => {
+                return item.getAttribute('chesspiece').slice(0,1) == 'b';
+            }).map((item) => {
+                return item.getAttribute('chesspiece').slice(0);
+            })
+
+            //here I am adding all of the piece's into our Javascript object
+            chess.properties.allWhitePieceTiles = allWhitePieces.slice(0);
+            chess.properties.allBlackPieceTiles = allBlackPieces.slice(0);
+
+
+            //then I can go through each index and use our moveoptions function to update our potentialMoves property for each color
+            for(let piece of chess.properties.allWhitePieceTiles){
+                chess.properties.potentialWhiteMoves = chess.properties.potentialWhiteMoves.concat(chess.methods.moveoptions(piece));
+            }
+            for(let piece of chess.properties.allBlackPieceTiles){
+                chess.properties.potentialBlackMoves = chess.properties.potentialBlackMoves.concat(chess.methods.moveoptions(piece));
+            }
+
+
+
             if(chess.properties.turn == 'w'){
                 //here we are changing whose turn it is to black
                 chess.properties.turn = 'b';
