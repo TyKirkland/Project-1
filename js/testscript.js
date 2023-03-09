@@ -8,6 +8,11 @@ let chess = {
         allBlackPieceTiles: [],
         potentialWhiteMoves: [],
         potentialBlackMoves: [],
+        w_check: false,
+        b_check: false,
+        futureWhiteMoves: [],
+        futureBlackMoves: [],
+        testing: false,
         pieces: {
             w_pawn1: {
                 position: '1_2',
@@ -300,12 +305,22 @@ let chess = {
                     }
                     //we need to slice all our options into our options variable
                     options = (chess.methods.options(startpoint, coordinates, (chess.properties.pieces[selectedpiece].type)).slice(0));
+                    //here if the king is being attacked we have to further limit our move options by running them through my testMove function
+                    if(chess.properties.w_check == true){
+                        options = chess.methods.testMove(options);
+                    }
                     //we can then add all our options to our highlighted array
                     chess.properties.highlighted = options.slice(0);
                     //and then call our togglehighlight method based on all our options
                     chess.methods.togglehighlight(options);
 
-                    break;
+                    //instead of breaking out of this switch for the pawns I am returning the potential attack targets of the pawn so I can track it in my potentialMoves array
+                    let attackArray = [(parseInt(position.x) + 1) + '_' + (parseInt(position.y) + 1),(parseInt(position.x) - 1) + '_' + (parseInt(position.y) + 1)];
+                    attackArray = attackArray.filter((item) => {
+                        return (item.slice(0,1) >= 1 && item.slice(0,1) <= 8 && item.slice(2,3) >= 1 && item.slice(2,3) <= 8)
+                    })
+                    return attackArray;
+
                 
                 case 'b_pawn':
                     //same as above but inverse
@@ -321,10 +336,18 @@ let chess = {
                     }
 
                     options = (chess.methods.options(startpoint, coordinates, (chess.properties.pieces[selectedpiece].type)).slice(0));
+                    if(chess.properties.b_check == true){
+                        options = chess.methods.testMove(options);
+                    }
                     chess.properties.highlighted = options.slice(0);
                     chess.methods.togglehighlight(options);
 
-                    break;
+                    //instead of breaking out of this switch for the pawns I am returning the potential attack targets of the pawn so I can track it in my potentialMoves array
+                    let attackArray2 = [(parseInt(position.x) + 1) + '_' + (parseInt(position.y) - 1),(parseInt(position.x) - 1) + '_' + (parseInt(position.y) - 1)];
+                    attackArray2 = attackArray2.filter((item) => {
+                        return (item.slice(0,1) >= 1 && item.slice(0,1) <= 8 && item.slice(2,3) >= 1 && item.slice(2,3) <= 8)
+                    })
+                    return attackArray2;
 
                 case 'w_bishop':
                     
@@ -337,6 +360,9 @@ let chess = {
                     coordinates = d1.concat(d2).concat(d3).concat(d4);
 
                     options = coordinates;
+                    if(chess.properties.w_check == true){
+                        options = chess.methods.testMove(options);
+                    }
                     chess.properties.highlighted = options.slice(0);
                     chess.methods.togglehighlight(options);
 
@@ -353,6 +379,9 @@ let chess = {
                     coordinates = d1.concat(d2).concat(d3).concat(d4);
 
                     options = coordinates.slice(0);
+                    if(chess.properties.b_check == true){
+                        options = chess.methods.testMove(options);
+                    }
                     chess.properties.highlighted = options.slice(0);
                     chess.methods.togglehighlight(options);
 
@@ -368,6 +397,9 @@ let chess = {
                     coordinates = d1.concat(d2).concat(d3).concat(d4);
 
                     options = coordinates.slice(0);
+                    if(chess.properties.w_check == true){
+                        options = chess.methods.testMove(options);
+                    }
                     chess.properties.highlighted = options.slice(0);
                     chess.methods.togglehighlight(options);
 
@@ -383,6 +415,9 @@ let chess = {
                     coordinates = d1.concat(d2).concat(d3).concat(d4);
     
                     options = coordinates.slice(0);
+                    if(chess.properties.b_check == true){
+                        options = chess.methods.testMove(options);
+                    }
                     chess.properties.highlighted = options.slice(0);
                     chess.methods.togglehighlight(options);
     
@@ -402,7 +437,9 @@ let chess = {
                     coordinates = d1.concat(d2).concat(d3).concat(d4).concat(d5).concat(d6).concat(d7).concat(d8);
 
                     options = coordinates.slice(0);
-                    chess.properties.highlighted = options.slice(0);
+                    if(chess.properties.w_check == true){
+                        options = chess.methods.testMove(options);
+                    }                    chess.properties.highlighted = options.slice(0);
                     chess.methods.togglehighlight(options);
 
                     break;
@@ -421,6 +458,9 @@ let chess = {
                     coordinates = d1.concat(d2).concat(d3).concat(d4).concat(d5).concat(d6).concat(d7).concat(d8);
 
                     options = coordinates.slice(0);
+                    if(chess.properties.b_check == true){
+                        options = chess.methods.testMove(options);
+                    }
                     chess.properties.highlighted = options.slice(0);
                     chess.methods.togglehighlight(options);
 
@@ -433,6 +473,9 @@ let chess = {
                     })
 
                     options = (chess.methods.options(startpoint, coordinates, (chess.properties.pieces[selectedpiece].type))).slice(0);
+                    if(chess.properties.w_check == true){
+                        options = chess.methods.testMove(options);
+                    }
                     chess.properties.highlighted = options.slice(0);
                     chess.methods.togglehighlight(options);
 
@@ -445,6 +488,10 @@ let chess = {
                     })
 
                     options = (chess.methods.options(startpoint, coordinates, (chess.properties.pieces[selectedpiece].type))).slice(0);
+                    if(chess.properties.b_check == true){
+                        options = chess.methods.testMove(options);
+                        console.log(options);
+                    }
                     chess.properties.highlighted = options.slice(0);
                     chess.methods.togglehighlight(options);
 
@@ -465,6 +512,14 @@ let chess = {
                     }
 
                     options = (chess.methods.options(startpoint, coordinates, (chess.properties.pieces[selectedpiece].type))).slice(0);
+                    
+                    //here we are checking to see if any of the potential tiles are being attacked so you cannot move to them
+                    options = options.filter((item) => {
+                        return chess.properties.potentialBlackMoves.includes(item) == false;
+                    })
+                    if(chess.properties.w_check == true){
+                        options = chess.methods.testMove(options);
+                    }
                     chess.properties.highlighted = options.slice(0);
                     chess.methods.togglehighlight(options);
 
@@ -485,6 +540,14 @@ let chess = {
                     }
 
                     options = (chess.methods.options(startpoint, coordinates, (chess.properties.pieces[selectedpiece].type))).slice(0);
+                    
+                    //here we are checking to see if any of the potential tiles are being attacked so you cannot move to them
+                    options = options.filter((item) => {
+                        return chess.properties.potentialWhiteMoves.includes(item) == false;
+                    })
+                    if(chess.properties.b_check == true){
+                        options = chess.methods.testMove(options);
+                    }
                     chess.properties.highlighted = options.slice(0);
                     chess.methods.togglehighlight(options);
 
@@ -634,6 +697,20 @@ let chess = {
                     //if the tile has the same color piece on it don't return the tile but stop the direction
                     else if(document.getElementById(value).getAttribute('chesspiece').slice(0,1) == chess.properties.turn){
                         stop = true;
+                        //this is so piece's that are being defended are recognized
+                        if(chess.properties.turn == 'w'){
+                            chess.properties.potentialWhiteMoves.push(value);
+                        }
+                        else if(chess.properties.turn == 'b'){
+                            chess.properties.potentialBlackMoves.push(value);
+                        }
+                        //you need to add these into our futureMoves for my testMove function
+                        if(chess.properties.turn == 'w'){
+                            chess.properties.futureBlackMoves.push(value);
+                        }
+                        else if(chess.properties.turn == 'b'){
+                            chess.properties.futureWhiteMoves.push(value);
+                        }
                     }
                     //if the tile has a different color piece on it and is not empty you return the value and also stop the direction
                     else{
@@ -787,7 +864,6 @@ let chess = {
             }
 
 
-
             if(chess.properties.turn == 'w'){
                 //here we are changing whose turn it is to black
                 chess.properties.turn = 'b';
@@ -815,6 +891,128 @@ let chess = {
                 let turndisplay = document.getElementById('turn');
                 turndisplay.innerText = "White's Turn";
             }
+        },
+
+        testMove(potentialtile){
+            //here we are going to test a potential move in order to block an attacker's line of sight to the king (pin itself)
+            //this function should take in a selectedpiece that has a name (piece name) and id (tile number) property
+            //and also a potentialtile that puts the selectedpiece in the potentialtile then runs all the potentialMoves that each piece would then have before setting everything back to what it was before the function started
+            //the function should also update the check property and if the check property is changed to false then this function returns true and if not it returns false and doesn't highlight the tile
+            //selectedpiece needs to have a name and id
+            let potentialWhiteResult = [];
+            let potentialBlackResult = [];
+            let whitePiecesArray = [];
+            let blackPiecesArray = [];
+            let validMoves = [];
+
+            potentialBlackResult.length = 0;
+            potentialWhiteResult.length = 0;
+            validMoves.length = 0;
+            whitePiecesArray.length = 0;
+            blackPiecesArray.length = 0;
+            
+            chess.properties.w_check = false;
+            chess.properties.b_check = false;
+            
+            //here I am putting each potential tile through a simulation where we put the selectedpiece in the potentialtile and then check to see if the king is still being attacked after that move, if he is not then filter that move as valid
+            for(let tile of potentialtile){
+
+                let startingTile = document.getElementById(chess.properties.selectedpiece);
+                let futureTile = document.getElementById(tile);
+                let pieceName = startingTile.getAttribute('chesspiece');
+                let targetName = futureTile.getAttribute('chesspiece');
+
+                potentialBlackResult.length = 0;
+                potentialWhiteResult.length = 0;
+                let allBlackPieces = [];
+                let allWhitePieces = [];
+
+                chess.properties.futureBlackMoves = [];
+                chess.properties.futureWhiteMoves = [];
+
+                //first I am setting each potential tile to the selected piece and removing it from our old square
+                //need to make sure to do this first so we can set the future's to the old name before deleting it from the old tile
+                futureTile.setAttribute('chesspiece', pieceName);
+                startingTile.setAttribute('chesspiece', 'null');
+                chess.properties.pieces[pieceName].position = tile;
+
+                //I then need to run the new chess board through the potential options to check if the king's square is still being attacked
+                let allTiles = document.querySelectorAll('.tile');
+                let tileArray = [];
+                for(let tile of allTiles){
+                    tileArray.push(tile);
+                }
+                //here I am first filtering through each tile to find the ones with white pieces
+                allWhitePieces = tileArray.filter((item) => {
+                    return item.getAttribute('chesspiece').slice(0,1) == 'w';
+                }).map((item) => {
+                //then I am mapping them to change each item to it's id value
+                    return item.getAttribute('chesspiece').slice(0);
+                })
+                //exact same as above but opposite
+                allBlackPieces = tileArray.filter((item) => {
+                    return item.getAttribute('chesspiece').slice(0,1) == 'b';
+                }).map((item) => {
+                    return item.getAttribute('chesspiece').slice(0);
+                })
+
+                whitePiecesArray = allWhitePieces.slice(0);
+                blackPiecesArray = allBlackPieces.slice(0);
+
+
+                //then I can go through each index and use our moveoptions function to update our potentialMoves property for each color
+                //make sure to check to see which turn it is so you only have to look through the enemies future moves to see if they remove check
+                if(chess.properties.turn == 'b'){
+                    for(let piece of whitePiecesArray){
+                        chess.properties.futureWhiteMoves = chess.properties.futureWhiteMoves.concat(chess.methods.moveoptions(piece));
+                    }
+                }
+                else{
+                    for(let piece of blackPiecesArray){
+                        chess.properties.futureBlackMoves = chess.properties.futureBlackMoves.concat(chess.methods.moveoptions(piece));
+                    }
+                }
+
+
+                if(chess.properties.turn == 'b') {
+                    if(chess.properties.futureWhiteMoves.includes(chess.properties.pieces['b_king'].position) == true){
+
+                    }
+                    else{
+                        validMoves.push(tile);
+                    }
+                }
+                if(chess.properties.turn == 'w'){
+                    if(chess.properties.futureBlackMoves.includes(chess.properties.pieces['w_king'].position) == true){
+
+                    }
+                    else{
+                        validMoves.push(tile);
+                    }
+                }
+                
+
+                //we then need to set the piece back to it's original position 
+                startingTile.setAttribute('chesspiece', pieceName);
+                if(targetName.slice(0,1) == 'w' || targetName.slice(0,1) == 'b'){
+                    futureTile.setAttribute('chesspiece', targetName);
+                }
+                else{
+                    futureTile.setAttribute('chesspiece', 'null');
+                }
+                chess.properties.pieces[pieceName].position = chess.properties.selectedpiece;
+            }
+
+            chess.properties.w_check = true;
+            chess.properties.b_check = true;
+            
+
+            //remember to togglehighlight and change the selected piece back to nothing so it doesn't bug and show the last piece it checked as the selected piece with it's highlighted moves
+            chess.methods.togglehighlight(chess.properties.highlighted);
+            chess.properties.highlighted.length = 0;
+
+            //and don't forget to return the now valid moves!
+            return validMoves;
         },
 
         togglehighlight(options) {
@@ -855,7 +1053,27 @@ tileclicks.forEach((tile) => {
             id: event.target.id
         };
 
-        //we want to check to see if the selected potential square to move to is an actual option
+        //here we are implimenting a check conditional which so far only allows you to move the king if it is being attacked
+        if(chess.properties.potentialBlackMoves.includes(chess.properties.pieces['w_king'].position) == true){
+            chess.properties.w_check = true;
+            // if(target.name != 'w_king' && target.name != 'b_king' && selectedpiece.name != 'w_king' && selectedpiece.name != 'b_king'){
+            //     chess.methods.togglehighlight(chess.properties.highlighted);
+            //     chess.properties.highlighted.length = 0;
+            //     chess.properties.selectedpiece = '';
+            //     return;
+            // }
+        }
+        else{
+            chess.properties.w_check = false;
+        }
+        if(chess.properties.potentialWhiteMoves.includes(chess.properties.pieces['b_king'].position) == true){
+            chess.properties.b_check = true;
+        }
+        else{
+            chess.properties.b_check = false;
+        }
+
+        //we want to check to see if the selected potential square to move to is an actual highlighted option
         let potentialtile = chess.properties.highlighted.some((item) => {
             return item == event.target.id;
         });
@@ -880,6 +1098,8 @@ tileclicks.forEach((tile) => {
         }
         //if there already is a selected piece but not a piece on the target square we want to run our move method
         else if(chess.properties.selectedpiece != '' && target.name == 'null' && potentialtile == true){
+            chess.properties.w_check = false;
+            chess.properties.b_check = false;
             chess.methods.move(target);
             chess.methods.endturn();
         }
@@ -891,6 +1111,8 @@ tileclicks.forEach((tile) => {
         }
         //here we are checking if we have already selected a piece, the target's name is a piece and if it is a potential tile to jump to before capturing
         else if(chess.properties.selectedpiece != '' && target.name != 'null' && potentialtile == true){
+            chess.properties.w_check = false;
+            chess.properties.b_check = false;
             chess.methods.capture(target);
             chess.methods.endturn();
         }
