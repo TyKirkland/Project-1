@@ -755,7 +755,8 @@ let chess = {
             }
 
             //here I am setting specific conditions for each direction you can castle
-            if(target.id == '7_1' && piece == 'w_king'){
+            //you need to make sure the king has never moved also
+            if(target.id == '7_1' && piece == 'w_king' && chess.properties.pieces['w_king'].moved == false){
                 //since we are already fully moving the king to the appropriate tile we just need to move the rook
                 //first we delete it from our old tile
                 let oldRookTile = document.getElementById('8_1');
@@ -772,7 +773,7 @@ let chess = {
             }
 
             //same as above but for long side castling
-            if(target.id == '3_1' && piece == 'w_king'){
+            if(target.id == '3_1' && piece == 'w_king' && chess.properties.pieces['w_king'].moved == false){
                 let oldRookTile = document.getElementById('1_1');
                 oldRookTile.innerHTML = '';
                 oldRookTile.setAttribute('chesspiece', 'null');
@@ -785,7 +786,7 @@ let chess = {
             }
 
             //same as above but with the black king long castling
-            if(target.id == '3_8' && piece == 'b_king'){
+            if(target.id == '3_8' && piece == 'b_king' && chess.properties.pieces['b_king'].moved == false){
                 let oldRookTile = document.getElementById('1_8');
                 oldRookTile.innerHTML = '';
                 oldRookTile.setAttribute('chesspiece', 'null');
@@ -798,7 +799,7 @@ let chess = {
             }
 
             //same as above but with black king short castling
-            if(target.id == '7_8' && piece == 'b_king'){
+            if(target.id == '7_8' && piece == 'b_king' && chess.properties.pieces['b_king'].moved == false){
                 let oldRookTile = document.getElementById('8_8');
                 oldRookTile.innerHTML = '';
                 oldRookTile.setAttribute('chesspiece', 'null');
