@@ -525,10 +525,13 @@ let chess = {
 
                     options = (chess.methods.options(startpoint, coordinates, (chess.properties.pieces[selectedpiece].type))).slice(0);
                     
+                    console.log("moveoptions pre-testMove: "+options);
+                    console.log(chess.properties.potentialBlackMoves);
                     //here we are checking to see if any of the potential tiles are being attacked so you cannot move to them
                     options = options.filter((item) => {
                         return chess.properties.potentialBlackMoves.includes(item) == false;
                     })
+                    console.log("moveoptions pre-testMove: "+options);
                     if(chess.properties.w_check == true){
                         options = chess.methods.testMove(options);
                     }
@@ -658,6 +661,7 @@ let chess = {
 
                 case 'w_king':
 
+                    console.log(coordinates);
                     coordinates = coordinates.filter((value) => {
                         return (document.getElementById(value).getAttribute('chesspiece') == 'null' || document.getElementById(value).getAttribute('chesspiece').slice(0,1) == 'b');
                     });
@@ -710,10 +714,11 @@ let chess = {
                     else if(document.getElementById(value).getAttribute('chesspiece').slice(0,1) == chess.properties.turn){
                         stop = true;
                         //this is so piece's that are being defended are recognized
-                        if(chess.properties.turn == 'w'){
+                        //the second conditional (check == true) is so if the piece is being attacked by your own piece during the testMove method it doesn't get added
+                        if(chess.properties.turn == 'w' && chess.properties.w_check == true){
                             chess.properties.potentialWhiteMoves.push(value);
                         }
-                        else if(chess.properties.turn == 'b'){
+                        else if(chess.properties.turn == 'b' && chess.properties.b_check == true){
                             chess.properties.potentialBlackMoves.push(value);
                         }
                         //you need to add these into our futureMoves for my testMove function
@@ -1108,7 +1113,8 @@ let chess = {
                         chess.properties.futureBlackMoves = chess.properties.futureBlackMoves.concat(chess.methods.moveoptions(piece));
                     }
                 }
-
+                console.log(blackPiecesArray);
+                console.log(chess.properties.futureBlackMoves);
 
                 if(chess.properties.turn == 'b') {
                     if(chess.properties.futureWhiteMoves.includes(chess.properties.pieces['b_king'].position) == true){
@@ -1126,7 +1132,8 @@ let chess = {
                         validMoves.push(tile);
                     }
                 }
-                
+                console.log("valid moves: "+validMoves);
+                console.log("potentialmove: "+tile);
 
                 //we then need to set the piece back to it's original position 
                 startingTile.setAttribute('chesspiece', pieceName);
@@ -1170,6 +1177,7 @@ const tileclicks = document.querySelectorAll(".tile");
 tileclicks.forEach((tile) => {
     tile.addEventListener('click', (event) => {
 
+        console.log(event.target);
         //need to scope this globally because I use it in my move function to update data
         var selectedpiece = {
             name: '',
@@ -1188,6 +1196,7 @@ tileclicks.forEach((tile) => {
             name: event.target.getAttribute('chesspiece'),
             id: event.target.id
         };
+        
 
         //we want to check to see if the selected potential square to move to is an actual highlighted option
         let potentialtile = chess.properties.highlighted.some((item) => {
