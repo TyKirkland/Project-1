@@ -993,6 +993,9 @@ let chess = {
                     chess.properties.selectedpiece = item.getAttribute('id');
                     if(chess.properties.potentialBlackMoves.includes(chess.properties.pieces['w_king'].position) == true){
                         chess.properties.w_check = true;
+                        //here is where we are updating the display text to say check
+                        let displayText = document.querySelector('#turn');
+                        displayText.innerText = "Check! White's turn";
                         //make sure these are wrapped in the check conditional so it doesn't get run unless a king is being checked, causes game to lag
                         if(chess.methods.testMove(chess.methods.moveoptions(item.getAttribute('chesspiece'))).length == 0){
     
@@ -1004,7 +1007,8 @@ let chess = {
                 }
             }
             if(allWhiteDefense.length == 0 && chess.properties.potentialBlackMoves.includes(chess.properties.pieces['w_king'].position) == true){
-                console.log("Black wins by Checkmate!")
+                let displayText = document.querySelector('#turn');
+                displayText.innerText = "Checkmate! Black Wins!";
             }
             //here I am doing the same as above but for black
             let allBlackDefense = [];
@@ -1013,6 +1017,9 @@ let chess = {
                     chess.properties.selectedpiece = item.getAttribute('id');
                     if(chess.properties.potentialWhiteMoves.includes(chess.properties.pieces['b_king'].position) == true){
                         chess.properties.b_check = true;
+                        //here we are updating the display text to say check
+                        let displayText = document.querySelector('#turn');
+                        displayText.innerText = "Check! Black's turn"
                         //make sure these are wrapped in the check conditional so it doesn't get run unless a king is being checked, causes game to lag
                         if(chess.methods.testMove(chess.methods.moveoptions(item.getAttribute('chesspiece'))).length == 0){
     
@@ -1024,7 +1031,8 @@ let chess = {
                 }
             }
             if(allBlackDefense.length == 0 && chess.properties.potentialWhiteMoves.includes(chess.properties.pieces['b_king'].position) == true){
-                console.log("White wins by Checkmate!")
+                let displayText = document.querySelector('#turn');
+                displayText.innerText = "Checkmate! White Wins!";
             }
 
             //finally make sure to reset the selected piece
@@ -1162,8 +1170,20 @@ let chess = {
     }
 }
 
+//here we are adding a Start button to the game which when clicked will turn the display text to the White's turn, remove the button and run the gameSetup method
+let body = document.querySelector('body');
+let startButton = document.createElement('button');
+startButton.classList.add('startButton');
+startButton.innerHTML= "Start!";
+body.appendChild(startButton);
 
-chess.methods.gamesetup();
+startButton.addEventListener('click', (event) => {
+    let turndisplay = document.getElementById('turn');
+    turndisplay.innerText = "White's Turn";
+    startButton.remove();
+    chess.methods.gamesetup();
+})
+
 
 const tileclicks = document.querySelectorAll(".tile");
 

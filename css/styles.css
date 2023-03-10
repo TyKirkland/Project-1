@@ -21,6 +21,7 @@ div * {
     float: right;
     text-align: center;
     padding: 0 0 5px 0;
+    font-size: 18px;
   }
 
 #game {
@@ -62,4 +63,16 @@ img{
 
 .red{
     background: red;
+}
+
+.startButton{
+    background-color: red;
+    z-index: 5;
+    text-align: center;
+    margin: auto;
+    position: relative;
+    display: flex;
+    bottom: 366px;
+    left: 24px;
+    font-size: 22px;
 }
