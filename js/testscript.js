@@ -525,13 +525,10 @@ let chess = {
 
                     options = (chess.methods.options(startpoint, coordinates, (chess.properties.pieces[selectedpiece].type))).slice(0);
                     
-                    console.log("moveoptions pre-testMove: "+options);
-                    console.log(chess.properties.potentialBlackMoves);
                     //here we are checking to see if any of the potential tiles are being attacked so you cannot move to them
                     options = options.filter((item) => {
                         return chess.properties.potentialBlackMoves.includes(item) == false;
                     })
-                    console.log("moveoptions pre-testMove: "+options);
                     if(chess.properties.w_check == true){
                         options = chess.methods.testMove(options);
                     }
@@ -661,7 +658,6 @@ let chess = {
 
                 case 'w_king':
 
-                    console.log(coordinates);
                     coordinates = coordinates.filter((value) => {
                         return (document.getElementById(value).getAttribute('chesspiece') == 'null' || document.getElementById(value).getAttribute('chesspiece').slice(0,1) == 'b');
                     });
@@ -1113,8 +1109,6 @@ let chess = {
                         chess.properties.futureBlackMoves = chess.properties.futureBlackMoves.concat(chess.methods.moveoptions(piece));
                     }
                 }
-                console.log(blackPiecesArray);
-                console.log(chess.properties.futureBlackMoves);
 
                 if(chess.properties.turn == 'b') {
                     if(chess.properties.futureWhiteMoves.includes(chess.properties.pieces['b_king'].position) == true){
@@ -1132,8 +1126,6 @@ let chess = {
                         validMoves.push(tile);
                     }
                 }
-                console.log("valid moves: "+validMoves);
-                console.log("potentialmove: "+tile);
 
                 //we then need to set the piece back to it's original position 
                 startingTile.setAttribute('chesspiece', pieceName);
@@ -1177,7 +1169,6 @@ const tileclicks = document.querySelectorAll(".tile");
 tileclicks.forEach((tile) => {
     tile.addEventListener('click', (event) => {
 
-        console.log(event.target);
         //need to scope this globally because I use it in my move function to update data
         var selectedpiece = {
             name: '',
