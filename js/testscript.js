@@ -1,5 +1,6 @@
 let chess = {
 
+    //I used this reference: "https://github.com/aliHaider-911/Chess-Game" to help set up the basic framework of my chess game
     properties: {
         turn: 'w',
         selectedpiece: '',
