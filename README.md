@@ -6,7 +6,9 @@ Welcome to the classic game of Chess! Using the game link provided you will be a
 
 <img src="https://i.imgur.com/UUF6iYH.png" width="250px" height="280px"> <img src="https://i.imgur.com/5oXyy9n.png" width="250px" height="280px"> <img src="https://i.imgur.com/E0kx15n.png" width="250px" height="280px">
 
-## User Stories
+## Live Link:
+Play the game [here](https://tykirkland.github.io/Project-1/)!
+## User Stories:
 ### MVP Goals:
 1. Create the 8x8 tile game board and a start button upon launch.
 2. After the start button is pushed initialize all 32 pieces in their correct positions (16 pawns, 4 knights, 4 bishops, 4 rooks, 2 queens, and 2 kings).
