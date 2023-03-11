@@ -26,7 +26,7 @@ Play the game [here](https://tykirkland.github.io/Project-1/)!
 13. Impliment checks and checkmate: if the king is currently under attack you get a notification and must either move the king to a safe tile or block the attacker with another piece. If there are no available squares to move to or pieces to block with then the game will end and declare the winner has checkmated his opponent.
 
 ### Stretch Goals:
-1. Impliment a draw mechanic where if both players have insufficient material (cannot checkmate), both players repeat the same move 3 times in a row, a player has no moves left to make, or the players reach 50 moves then the game draws.
+1. Impliment a draw mechanic where if both players have insufficient material (each player only has a king) or a player has no moves left to make. (COMPLETE)
 2. Impliment draw and forfeit buttons where the players have the option to either accept a draw and if one of the players quit you don't have to finish out the game.
 3. Let the user input a name for each side so we can keep track of the win/loss/draw history and flip sides after each game is over.
 4. An undo button which will allow the user to undo the most recent move.
