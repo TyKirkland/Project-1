@@ -4,15 +4,12 @@ let chess = {
         turn: 'w',
         selectedpiece: '',
         highlighted: [],
-        allWhitePieceTiles: [],
-        allBlackPieceTiles: [],
         potentialWhiteMoves: [],
         potentialBlackMoves: [],
-        w_check: false,
-        b_check: false,
         futureWhiteMoves: [],
         futureBlackMoves: [],
-        testing: false,
+        w_check: false,
+        b_check: false,
         w_EnPassant: 0,
         b_EnPassant: 0,
         pieces: {
@@ -245,17 +242,18 @@ let chess = {
     
     methods: {
         
+        //this method will be called when the start button is pushed
         gamesetup() {
-            //initialize the tiles
+            //initialize the tiles class in our HTML
             const tiles = document.querySelectorAll('.tile');
             tiles.forEach((tile) => {
-                //we are setting each tile to have an attribute of null for later conditionals
+                //we are setting each tile to have an attribute of null to recognize there is no piece on the tile
                 tile.setAttribute('chesspiece', 'null');
             })
 
-            //each piece in this for loop is the object name (w_pawn1, etc, etc)
+            //each piece in this for loop is the object name (w_pawn1, b_king, etc..)
             for(let piece in chess.properties.pieces){
-                //first we are grabbing each piece's position (identical to the id's in my html)
+                //first we are grabbing each piece's starting position (identical to the id's in my html)
                 let pieceposition = document.getElementById(chess.properties.pieces[piece].position);
                 //we are then assigning the innerHTML to the image of the appropriate piece
                 pieceposition.innerHTML = `<img src='${chess.properties.pieces[piece].img}'>`;
@@ -266,6 +264,7 @@ let chess = {
 
         moveoptions(selectedpiece) {
 
+            //here we initialize the starting position so we can highlight the correct move tiles 
             let position = {
                 x: '',
                 y: ''
@@ -275,31 +274,31 @@ let chess = {
             position.x = chess.properties.pieces[selectedpiece].position.split('_')[0];
             position.y = chess.properties.pieces[selectedpiece].position.split('_')[1];
 
-            //these variables need to be var instead of let so they are scoped globally
-            //these will be all the squares they can go to
-            var options = [];
-            var coordinates = [];
-            var startpoint = chess.properties.pieces[selectedpiece].position;
-            //these will be all the different directions they can go
-            var d1,d2,d3,d4,d5,d6,d7,d8;
+            //initialize the variables so we can get the coordinates of the potential moves and filter through the options 
+            let options = [];
+            let coordinates = [];
+            let startpoint = chess.properties.pieces[selectedpiece].position;
+            //these will be all the different directions a piece can potentially go in one line (bishops,rooks,queens)
+            let d1,d2,d3,d4,d5,d6,d7,d8;
 
             //this will check if we already have pieces highlighted and if we do it will toggle them
             if(chess.properties.highlighted.length != 0){
                 chess.methods.togglehighlight(chess.properties.highlighted);
-                // this line is to fix a bug where it keeps adding more to the highlighted property
+                // this line is to fix a bug where it continuously added more to the highlighted array
                 chess.properties.highlighted.length = 0;
             }
 
+            //based on the piece type we are going to be giving our piece coordinates and then filter through those coordinates accordingly before highlighting the appropriate tiles
             switch(chess.properties.pieces[selectedpiece].type) {
                 
                 case 'w_pawn':
-                    //first we are using a conditional to see if they can move forward twice
+                    //first we are using a conditional to see if a pawn can move forward twice
                     if(chess.properties.pieces[selectedpiece].moved == false){
                         coordinates = [{x: 0, y: 1}, {x: 0, y: 2}, {x: 1, y: 1}, {x: -1, y: 1}].map((value) => {
                             return (parseInt(position.x) + parseInt(value.x)) + '_' + (parseInt(position.y) + parseInt(value.y));
                         });
                     }
-                    //if it has moved then we only add the one tile forward movement
+                    //if it has already moved then we only add the one tile forward movement
                     else if(chess.properties.pieces[selectedpiece].moved == true){
                         coordinates = [{ x: 0, y: 1 },{ x: 1, y: 1 },{ x: -1, y: 1}].map((value) => {
                             return (parseInt(position.x) + parseInt(value.x)) + '_' + (parseInt(position.y) + parseInt(value.y));
@@ -308,6 +307,8 @@ let chess = {
                     //we need to slice all our options into our options variable
                     options = (chess.methods.options(startpoint, coordinates, (chess.properties.pieces[selectedpiece].type)).slice(0));
                     //here if the king is being attacked we have to further limit our move options by running them through my testMove function
+                    //the check properties will always be true unless this method is being ran through using the testMove function (gives the ability to pin pieces to the king)
+                    //prevents an infinite loop
                     if(chess.properties.w_check == true){
                         options = chess.methods.testMove(options);
                     }
@@ -316,9 +317,9 @@ let chess = {
                     //and then call our togglehighlight method based on all our options
                     chess.methods.togglehighlight(options);
 
-                    //this conditional is so we can return the attacking moves as potential castling stoppers but if you are being checked you need to return the full move options
+                    //this conditional is so we can return the attacking moves as potential castling stoppers but if you are being checked you need to return the full move options to potentially block the attacker & pin your piece
                     if(chess.properties.w_check == false){
-                        //instead of breaking out of this switch for the pawns I am returning the potential attack targets of the pawn so I can track it in my potentialMoves array
+                        //we want our pawns to be able to threaten the attack without being able to move there
                         let attackArray = [(parseInt(position.x) + 1) + '_' + (parseInt(position.y) + 1),(parseInt(position.x) - 1) + '_' + (parseInt(position.y) + 1)];
                         attackArray = attackArray.filter((item) => {
                             return (item.slice(0,1) >= 1 && item.slice(0,1) <= 8 && item.slice(2,3) >= 1 && item.slice(2,3) <= 8)
@@ -351,7 +352,6 @@ let chess = {
                     chess.methods.togglehighlight(options);
 
                     if(chess.properties.b_check == false){
-                        //instead of breaking out of this switch for the pawns I am returning the potential attack targets of the pawn so I can track it in my potentialMoves array
                         let attackArray2 = [(parseInt(position.x) + 1) + '_' + (parseInt(position.y) - 1),(parseInt(position.x) - 1) + '_' + (parseInt(position.y) - 1)];
                         attackArray2 = attackArray2.filter((item) => {
                             return (item.slice(0,1) >= 1 && item.slice(0,1) <= 8 && item.slice(2,3) >= 1 && item.slice(2,3) <= 8)
@@ -364,15 +364,18 @@ let chess = {
 
                 case 'w_bishop':
                     
+                    //for pieces that move in directions we are using a different method which will stop the line of sight once a piece is reached
                     d1 = chess.methods.directionoptions(position, [{x: 1, y: 1},{x: 2, y: 2},{x: 3, y: 3},{x: 4, y: 4},{x: 5, y: 5},{x: 6, y: 6},{x: 7, y: 7}]);
                     d2 = chess.methods.directionoptions(position, [{x: 1, y: -1},{x: 2, y: -2},{x: 3, y: -3},{x: 4, y: -4},{x: 5, y: -5},{x: 6, y: -6},{x: 7, y: -7}]);
                     d3 = chess.methods.directionoptions(position, [{x: -1, y: 1},{x: -2, y: 2},{x: -3, y: 3},{x: -4, y: 4},{x: -5, y: 5},{x: -6, y: 6},{x: -7, y: 7}]);
                     d4 = chess.methods.directionoptions(position, [{x: -1, y: -1},{x: -2, y: -2},{x: -3, y: -3},{x: -4, y: -4},{x: -5, y: -5},{x: -6, y: -6},{x: -7, y: -7}]);
 
-                    //concat combines the arrays together
+                    //we then need to combine all our different direction options together to form the potential coordinates
                     coordinates = d1.concat(d2).concat(d3).concat(d4);
 
                     options = coordinates;
+                    //the check properties will always be true unless this method is being ran through using the testMove function (gives the ability to pin pieces to the king)
+                    //prevents an infinite loop
                     if(chess.properties.w_check == true){
                         options = chess.methods.testMove(options);
                     }
@@ -388,7 +391,6 @@ let chess = {
                     d3 = chess.methods.directionoptions(position, [{x: -1, y: 1},{x: -2, y: 2},{x: -3, y: 3},{x: -4, y: 4},{x: -5, y: 5},{x: -6, y: 6},{x: -7, y: 7}]);
                     d4 = chess.methods.directionoptions(position, [{x: -1, y: -1},{x: -2, y: -2},{x: -3, y: -3},{x: -4, y: -4},{x: -5, y: -5},{x: -6, y: -6},{x: -7, y: -7}]);
 
-                    //concat combines the arrays together
                     coordinates = d1.concat(d2).concat(d3).concat(d4);
 
                     options = coordinates.slice(0);
@@ -566,9 +568,11 @@ let chess = {
                     break;
 
             }
+            //we are returning the options also so I can accurately update the potentialMoves arrays
             return options;
         },
 
+        //this options method will take in potential coordinates and filter out out of bounds tiles, same team tiles, and if it is a pawn the ability to double jump
         options(startpoint, coordinates, piecetype){
 
             //first we need to check if any of the possible coordinates are out of bounds
@@ -585,8 +589,8 @@ let chess = {
             //we can then run through our potential piece type's and perform the appropriate functions based on what they are
             switch(piecetype){
                 case 'w_pawn':
-                    //we are filtering through our coordinates to check if they are movable
-                    coordinates = coordinates.filter((value) => {
+
+                        coordinates = coordinates.filter((value) => {
                         let sp = {x: 0, y: 0};
                         let coordinate = value.split('_');
                         sp.x = startpoint.split('_')[0];
@@ -596,6 +600,7 @@ let chess = {
                         if(coordinate[0] != sp.x){
                             let piecename = document.getElementById(value).getAttribute('chesspiece');
                             //if there is a piece and it's black we can return the value as a valid coordinate option
+                            //or if it has the opposite colors enpassant attribute you can capture
                             return (piecename != null && piecename.slice(0,1) == 'b') || document.getElementById(value).hasAttribute('b_enpassant') == true;
                         }
                         
@@ -603,10 +608,11 @@ let chess = {
                             //here we are checking if the 1st jump square has a piece on it
                             let firsttile = document.getElementById(sp.x+'_'+(parseInt(sp.y)+1)).getAttribute('chesspiece');
                             if(coordinate[1] == (parseInt(sp.y) + 2) && firsttile != 'null'){
-                                //we are stopping it from returning if tile 1/2 is not equal to null
+                                //we are stopping it from returning if the first tile is not equal to null
                             }
                             else{
                                 let jumpabletile = document.getElementById(value).getAttribute('chesspiece');
+                                //if  the second tile is empty we can return the value as a valid coordinate
                                 return jumpabletile == 'null';
                             }
                         }
@@ -625,6 +631,7 @@ let chess = {
                         if(coordinate[0] != sp.x){
                             let piecename = document.getElementById(value).getAttribute('chesspiece');
                             //if there is a piece and it's white we can return the value as a valid coordinate option
+                            //or if it has the opposite colors enpassant attribute you can capture
                             return (piecename != null && piecename.slice(0,1) == 'w') || document.getElementById(value).hasAttribute('w_enpassant') == true;
                         }
                         
@@ -674,12 +681,13 @@ let chess = {
             return coordinates;
         },
 
+        //here we are sorting the the directional pieces to filter out out of bounds and stop the directions line of sight when a friendly or enemy piece is reached
         directionoptions(position, coordinates){
 
             //we need to initialize a stop variable which will stop the coordinates from continuing once we reach a piece
             let stop = false;
 
-            //first we are turning all the potential coordinates into the appropriate tile coordinates
+            //first we are turning all the potential coordinates into the appropriate tiles based on our starting position
             coordinates = coordinates.map((value) => {
                 return (parseInt(position.x) + parseInt(value.x)) + '_' + (parseInt(position.y) + parseInt(value.y));
             });
@@ -710,14 +718,14 @@ let chess = {
                     else if(document.getElementById(value).getAttribute('chesspiece').slice(0,1) == chess.properties.turn){
                         stop = true;
                         //this is so piece's that are being defended are recognized
-                        //the second conditional (check == true) is so if the piece is being attacked by your own piece during the testMove method it doesn't get added
+                        //the second conditional (check == true) is so if the piece is being attacked by your own piece during the testMove method it doesn't get added (fixed bug where it wouldn't let you capture with king if your piece was also attacking it)
                         if(chess.properties.turn == 'w' && chess.properties.w_check == true){
                             chess.properties.potentialWhiteMoves.push(value);
                         }
                         else if(chess.properties.turn == 'b' && chess.properties.b_check == true){
                             chess.properties.potentialBlackMoves.push(value);
                         }
-                        //you need to add these into our futureMoves for my testMove function
+                        //you need to also add these into our futureMoves arrays for the testMove function because it will run the opposite color's pieces into this conditional (big bug fix)
                         if(chess.properties.turn == 'w'){
                             chess.properties.futureBlackMoves.push(value);
                         }
@@ -736,6 +744,7 @@ let chess = {
             return coordinates;
         },
 
+        //this method will be used if the highlighted tile clicked does not have a piece on it
         move(target){
             
             //we first need to get the appropriate piece name and the target tile 
@@ -744,8 +753,11 @@ let chess = {
 
             //here I am setting up En Passant functionality
             if(piece.slice(0,6) == 'b_pawn' && chess.properties.pieces[piece].position == (targettile.getAttribute('id').slice(0,1) + '_' + (parseInt(targettile.getAttribute('id').slice(2,3)) + 2))){
+                //we want to target the tile that was hopped over
                 let enPassantTile = document.getElementById(targettile.getAttribute('id').slice(0,1) + '_' + (parseInt(targettile.getAttribute('id').slice(2,3)) + 1));
+                //then give it the enpassant attribute which will be removed in the endTurn method after the tally reaches 2
                 enPassantTile.setAttribute('b_enpassant', piece);
+                //reset the tally also
                 chess.properties.b_EnPassant = 0;
             }
             if(piece.slice(0,6) == 'w_pawn' && chess.properties.pieces[piece].position == (targettile.getAttribute('id').slice(0,1) + '_' + (parseInt(targettile.getAttribute('id').slice(2,3)) - 2))){
@@ -754,10 +766,9 @@ let chess = {
                 chess.properties.w_EnPassant = 0;
             }
 
-            //here I am setting specific conditions for each direction you can castle
-            //you need to make sure the king has never moved also
+            //here I am implimenting castling based on specific conditions
             if(target.id == '7_1' && piece == 'w_king' && chess.properties.pieces['w_king'].moved == false){
-                //since we are already fully moving the king to the appropriate tile we just need to move the rook
+                //since we are already moving the king to the appropriate tile below we just need to move the rook
                 //first we delete it from our old tile
                 let oldRookTile = document.getElementById('8_1');
                 oldRookTile.innerHTML = '';
@@ -825,6 +836,7 @@ let chess = {
             chess.properties.pieces[piece].moved = true;
         },
 
+        //this method will be invoked when the target tile has an enemy piece on it
         capture(target){
 
             //first we need to create a variable which will hold our already selected piece's name and tile id
@@ -834,10 +846,10 @@ let chess = {
                 id: chess.properties.selectedpiece
             };
 
-            //then we need to update our new cell with the correct picture and attribute
+            //initialize the target tile
             let targettile = document.getElementById(target.id);
 
-            //here I am checking if the captured tile was an en passant
+            //here I am checking if the captured tile was an en passant because it captures differently
             if(targettile.hasAttribute('b_enpassant') == true){
                 //if we just captured a piece that has the enpassant property we need to delete the piece from the square below our target
                 let actualTargetTile = document.getElementById(targettile.getAttribute('id').slice(0,1) + '_' + (parseInt(targettile.getAttribute('id').slice(2,3)) - 1));
@@ -845,14 +857,15 @@ let chess = {
                 chess.properties.pieces[actualTargetTile.getAttribute('chesspiece')].captured = true;
                 actualTargetTile.setAttribute('chesspiece', 'null');
             }
-            if(targettile.hasAttribute('w_enpassant') == true){
-                //if we just captured a piece that has the enpassant property we need to delete the piece from the square below our target
+            else if(targettile.hasAttribute('w_enpassant') == true){
+                //if we just captured a piece that has the enpassant property we need to delete the piece from the square above our target
                 let actualTargetTile = document.getElementById(targettile.getAttribute('id').slice(0,1) + '_' + (parseInt(targettile.getAttribute('id').slice(2,3)) + 1));
                 actualTargetTile.innerHTML = '';
                 chess.properties.pieces[actualTargetTile.getAttribute('chesspiece')].captured = true;
                 actualTargetTile.setAttribute('chesspiece', 'null');
             }
 
+            //we then need to replace the targetted tile with the new piece properties
             targettile.innerHTML = `<img src='${chess.properties.pieces[selectedpiece.name].img}'>`;
             targettile.setAttribute('chesspiece', selectedpiece.name);
 
@@ -861,25 +874,25 @@ let chess = {
             oldtile.innerHTML = '';
             oldtile.setAttribute('chesspiece', 'null');
 
-            //then we need to update our object information accordingly
+            //then we need to update our Javascript object information accordingly
             chess.properties.pieces[selectedpiece.name].position = target.id;
             chess.properties.pieces[selectedpiece.name].moved = true;
             
+            //here we are only updating the targeted piece as captured if it isn't an en passant
             if(targettile.hasAttribute('w_enpassant') == false && targettile.hasAttribute('b_enpassant') == false){
-                //here we are only updating the targeted piece as captured if it isn't an en passant
                 chess.properties.pieces[target.name].captured = true;
             }
-
         },
 
         endturn() {
-            //here I am trying to store all the pieces and their potential moves into an array so I can check if certain tiles are being attacked for castling and king moves/checkmate            let allTiles = document.querySelectorAll('.tile');
+            //here I am storing all the pieces and their potential moves into an array so I can check if certain tiles are being attacked for castling and potential king moves
             let allTiles = document.querySelectorAll('.tile');
             let tileArray = [];
             for(let tile of allTiles){
                 tileArray.push(tile);
             }
 
+            //make sure to reset potentialMoves before you refresh them for that turn
             chess.properties.potentialWhiteMoves.length = 0;
             chess.properties.potentialBlackMoves.length = 0;
 
@@ -897,16 +910,11 @@ let chess = {
                 return item.getAttribute('chesspiece').slice(0);
             })
 
-            //here I am adding all of the piece's into our Javascript object
-            chess.properties.allWhitePieceTiles = allWhitePieces.slice(0);
-            chess.properties.allBlackPieceTiles = allBlackPieces.slice(0);
-
-
             //then I can go through each index and use our moveoptions function to update our potentialMoves property for each color
-            for(let piece of chess.properties.allWhitePieceTiles){
+            for(let piece of allWhitePieces){
                 chess.properties.potentialWhiteMoves = chess.properties.potentialWhiteMoves.concat(chess.methods.moveoptions(piece));
             }
-            for(let piece of chess.properties.allBlackPieceTiles){
+            for(let piece of allBlackPieces){
                 chess.properties.potentialBlackMoves = chess.properties.potentialBlackMoves.concat(chess.methods.moveoptions(piece));
             }
 
@@ -917,6 +925,7 @@ let chess = {
                 return item.getAttribute('chesspiece').slice(0);
             });
 
+            //if any of the white pawns reaches the eighth rank they promote to a queen automatically (I got lazy)
             for(let pawn of allWhitePawns){
                 if(chess.properties.pieces[pawn].position == '1_8' || chess.properties.pieces[pawn].position == '2_8' || chess.properties.pieces[pawn].position == '3_8' || chess.properties.pieces[pawn].position == '4_8' || chess.properties.pieces[pawn].position == '5_8' || chess.properties.pieces[pawn].position == '6_8' || chess.properties.pieces[pawn].position == '7_8' || chess.properties.pieces[pawn].position == '8_8'){
                     chess.properties.pieces[pawn].type = 'w_queen';
@@ -942,9 +951,10 @@ let chess = {
                 }
             }
 
-            //here I am removing all the En Passant attributes if it is greater than 2 (gets set to 0 when a pawn jumps 2 tiles forward)
+            //here I am adding one and removing all the En Passant attributes if it is greater than 2 (gets set to 0 when a pawn jumps 2 tiles forward)
             chess.properties.w_EnPassant++;
             chess.properties.b_EnPassant++;
+            //removed at the end of the other player's turn
             if(chess.properties.w_EnPassant >= 2){
                 for(let tile of tileArray){
                     tile.removeAttribute('w_enpassant');
@@ -957,15 +967,16 @@ let chess = {
             }
 
 
+            //here we are swapping the turn
             if(chess.properties.turn == 'w'){
-                //here we are changing whose turn it is to black
+                //white will become black
                 chess.properties.turn = 'b';
 
-                //and then toggling all the highlighted squares before setting the highlighted array back to nothing
+                //and then toggle all the highlighted tiles before setting the highlighted array back to 0
                 chess.methods.togglehighlight(chess.properties.highlighted);
                 chess.properties.highlighted.length = 0;
 
-                //we then also need to set the selected piece back to ''
+                //we then also need to set the selected piece back to nothing
                 chess.properties.selectedpiece = '';
 
                 //we then need to change our turn text to the opposite colors turn
@@ -987,29 +998,36 @@ let chess = {
 
 
             //here I am implimenting a checkmate check for white
+            //allDefense arrays store the potential moves you have to respond to a check threat, if the length is 0 checkmate will occur
             let allWhiteDefense = [];
             for(let item of allTiles){
                 if(item.getAttribute('chesspiece').slice(0,1) == 'w'){
                     chess.properties.selectedpiece = item.getAttribute('id');
+                    //this conditional checks the array that is updated at the end of every turn above
                     if(chess.properties.potentialBlackMoves.includes(chess.properties.pieces['w_king'].position) == true){
                         chess.properties.w_check = true;
-                        //here is where we are updating the display text to say check
+                        //here is where we are overriding the display text to say check
                         let displayText = document.querySelector('#turn');
                         displayText.innerText = "Check! White's turn";
-                        //make sure these are wrapped in the check conditional so it doesn't get run unless a king is being checked, causes game to lag
+                        
+                        //we then need to check to see if you have any potential moves
+                        //make sure these are wrapped in the check conditional so it doesn't get run unless a king is being checked, causes game to lag after you move a piece
                         if(chess.methods.testMove(chess.methods.moveoptions(item.getAttribute('chesspiece'))).length == 0){
     
                         }
+                        //if you do then it will be pushed into this array to counter my checkmate conditional
                         else{
                             allWhiteDefense.push(item);
                         }
                     }
                 }
             }
+            //checkmate conditional
             if(allWhiteDefense.length == 0 && chess.properties.potentialBlackMoves.includes(chess.properties.pieces['w_king'].position) == true){
                 let displayText = document.querySelector('#turn');
                 displayText.innerText = "Checkmate! Black Wins!";
             }
+
             //here I am doing the same as above but for black
             let allBlackDefense = [];
             for(let item of allTiles){
@@ -1039,40 +1057,36 @@ let chess = {
             chess.properties.selectedpiece = '';
         },
 
+        //here we are going to test a potentialtile array to find moves that allow the tile the king is occupying to be safe
         testMove(potentialtile){
-            //here we are going to test a potential move in order to block an attacker's line of sight to the king (pin itself)
-            //this function should take in a selectedpiece that has a name (piece name) and id (tile number) property
-            //and also a potentialtile that puts the selectedpiece in the potentialtile then runs all the potentialMoves that each piece would then have before setting everything back to what it was before the function started
-            //the function should also update the check property and if the check property is changed to false then this function returns true and if not it returns false and doesn't highlight the tile
-            //selectedpiece needs to have a name and id
-            let potentialWhiteResult = [];
-            let potentialBlackResult = [];
+
+            //here we initialize our future pieces and their results as well as the validMoves array where we will return moves that meet the conditions
             let whitePiecesArray = [];
             let blackPiecesArray = [];
+            let potentialWhiteResult = [];
+            let potentialBlackResult = [];
             let validMoves = [];
 
-            potentialBlackResult.length = 0;
-            potentialWhiteResult.length = 0;
-            validMoves.length = 0;
-            whitePiecesArray.length = 0;
-            blackPiecesArray.length = 0;
-            
+            //we also need to change our check property to false so it doesn't cause an infinite loop in our moveoptions method            
             chess.properties.w_check = false;
             chess.properties.b_check = false;
             
             //here I am putting each potential tile through a simulation where we put the selectedpiece in the potentialtile and then check to see if the king is still being attacked after that move, if he is not then filter that move as valid
             for(let tile of potentialtile){
 
+                //the selected piece is stored before the moveoptions method gets run in our click event listener
                 let startingTile = document.getElementById(chess.properties.selectedpiece);
                 let futureTile = document.getElementById(tile);
                 let pieceName = startingTile.getAttribute('chesspiece');
                 let targetName = futureTile.getAttribute('chesspiece');
 
+                //we need to reset the array 
                 potentialBlackResult.length = 0;
                 potentialWhiteResult.length = 0;
                 let allBlackPieces = [];
                 let allWhitePieces = [];
 
+                //make sure to reset the potential future moves on each instance
                 chess.properties.futureBlackMoves = [];
                 chess.properties.futureWhiteMoves = [];
 
@@ -1102,23 +1116,20 @@ let chess = {
                     return item.getAttribute('chesspiece').slice(0);
                 })
 
-                whitePiecesArray = allWhitePieces.slice(0);
-                blackPiecesArray = allBlackPieces.slice(0);
-
-
                 //then I can go through each index and use our moveoptions function to update our potentialMoves property for each color
-                //make sure to check to see which turn it is so you only have to look through the enemies future moves to see if they remove check
+                //make sure to check to see which turn it is so you only have to look through the enemies future moves to see if they remove check (less lag and problems)
                 if(chess.properties.turn == 'b'){
-                    for(let piece of whitePiecesArray){
+                    for(let piece of allWhitePieces){
                         chess.properties.futureWhiteMoves = chess.properties.futureWhiteMoves.concat(chess.methods.moveoptions(piece));
                     }
                 }
                 else{
-                    for(let piece of blackPiecesArray){
+                    for(let piece of allBlackPieces){
                         chess.properties.futureBlackMoves = chess.properties.futureBlackMoves.concat(chess.methods.moveoptions(piece));
                     }
                 }
 
+                //we then push the move into the validMoves array if the futureMoves array does not include the kings position
                 if(chess.properties.turn == 'b') {
                     if(chess.properties.futureWhiteMoves.includes(chess.properties.pieces['b_king'].position) == true){
 
@@ -1136,22 +1147,28 @@ let chess = {
                     }
                 }
 
-                //we then need to set the piece back to it's original position 
+                //we then need to set the piece back to it's original position before the simulation
                 startingTile.setAttribute('chesspiece', pieceName);
+                
+                //if the target was a piece we need to reset it to it's appropriate value
                 if(targetName.slice(0,1) == 'w' || targetName.slice(0,1) == 'b'){
                     futureTile.setAttribute('chesspiece', targetName);
                 }
+                //if not reset it to null
                 else{
                     futureTile.setAttribute('chesspiece', 'null');
                 }
+
+                //then also set the piece's Javascript object position back to the original tile
                 chess.properties.pieces[pieceName].position = chess.properties.selectedpiece;
             }
 
+            //after the simulation is over turn the check properties back to true
             chess.properties.w_check = true;
             chess.properties.b_check = true;
             
 
-            //remember to togglehighlight and change the selected piece back to nothing so it doesn't bug and show the last piece it checked as the selected piece with it's highlighted moves
+            //remember to togglehighlight and change the selected piece back to nothing so it doesn't bug and show the last piece it checked
             chess.methods.togglehighlight(chess.properties.highlighted);
             chess.properties.highlighted.length = 0;
 
@@ -1159,8 +1176,10 @@ let chess = {
             return validMoves;
         },
 
+        //a standard togglehighlight function (accepts an array)
         togglehighlight(options) {
             options.forEach((element) => {
+                //fixes but where you can through the div and highlight the body background
                 if(element[1] == '_'){
                     let color = document.getElementById(element);
                     color.classList.toggle('red');
@@ -1170,14 +1189,21 @@ let chess = {
     }
 }
 
-//here we are adding a Start button to the game which when clicked will turn the display text to the White's turn, remove the button and run the gameSetup method
+//here the page begins to load 
+
+//initializing the appropriate pieces
 let body = document.querySelector('body');
 let startButton = document.createElement('button');
+
+//also add the startButton class and change it's innerHTML to Start
 startButton.classList.add('startButton');
 startButton.innerHTML= "Start!";
+
+//then append it to the body (styled in css to appear in the middle of the board statically)
 body.appendChild(startButton);
 
-startButton.addEventListener('click', (event) => {
+//adding event listener which when clicked will turn the display text to White's turn, remove the button and run the gameSetup method
+startButton.addEventListener('click', () => {
     let turndisplay = document.getElementById('turn');
     turndisplay.innerText = "White's Turn";
     startButton.remove();
@@ -1185,18 +1211,20 @@ startButton.addEventListener('click', (event) => {
 })
 
 
+//grabbing all the tiles
 const tileclicks = document.querySelectorAll(".tile");
 
+//adding an eventlistener to each tile
 tileclicks.forEach((tile) => {
     tile.addEventListener('click', (event) => {
 
-        //need to scope this globally because I use it in my move function to update data
-        var selectedpiece = {
+        //this will store the piece so it can distinguish between a moveoption click and move/capture among more conditionals
+        let selectedpiece = {
             name: '',
             id: chess.properties.selectedpiece
         };
 
-        //checking to see if we are selecting a fresh piece or moving/capturing later on
+        //conditions to check to see if we are selecting a fresh piece or moving/capturing
         if(chess.properties.selectedpiece == ''){
             selectedpiece.name = document.getElementById(event.target.id)
         }
@@ -1204,7 +1232,8 @@ tileclicks.forEach((tile) => {
             selectedpiece.name = document.getElementById(chess.properties.selectedpiece).getAttribute('chesspiece');
         }
 
-        var target = {
+        //target will be activated always, used in conditionals also
+        let target = {
             name: event.target.getAttribute('chesspiece'),
             id: event.target.id
         };
@@ -1217,7 +1246,7 @@ tileclicks.forEach((tile) => {
         
         //here we want to show our options if there is no selected piece
         if(chess.properties.selectedpiece == '' && target.name.slice(0,1) == chess.properties.turn){
-            //we also need to set the selectedpiece as the now clicked on piece
+            //we also need to set the selectedpiece as the now clicked on piece before running the testMove method
             chess.properties.selectedpiece = event.target.id;
             //this is a workaround for pinning, the testMove function automatically makes the check properties true at the end so we are testing all the moves to see if the consequences of that move loses our king
             chess.methods.testMove(chess.methods.moveoptions(event.target.getAttribute('chesspiece')));
@@ -1225,36 +1254,46 @@ tileclicks.forEach((tile) => {
             //the check properties will be true at all times except when being run by the testMove function since the testMove function above sets it to true at the end
             chess.methods.moveoptions(event.target.getAttribute('chesspiece'));
         }
+
         //here we are deselecting the available tiles if the user pushes the already selected tile
         else if(chess.properties.selectedpiece == event.target.id){
             chess.methods.togglehighlight(chess.properties.highlighted);
             chess.properties.highlighted.length = 0;
             chess.properties.selectedpiece = '';
         }
+
         //here we want to disable all our highlighted squares and highlight the new ones when a different piece is clicked
         else if(chess.properties.selectedpiece != '' && target.name.slice(0,1) == chess.properties.turn){
             chess.properties.selectedpiece = event.target.id;
             chess.methods.moveoptions(event.target.getAttribute('chesspiece'));
         }
-        //if there already is a selected piece but not a piece on the target square we want to run our move method
-        else if(chess.properties.selectedpiece != '' && target.name == 'null' && potentialtile == true && event.target.hasAttribute('b_enpassant') == false && event.target.hasAttribute('w_enpassant') == false){
+
+        //here we are checking if we have already selected a piece, the target's name is a piece and if it is a potential tile to jump to before capturing
+        //you need to have this conditional before the move conditional for En Passant functionality
+        else if(chess.properties.selectedpiece != '' && (target.name != 'null' || (event.target.hasAttribute('b_enpassant') == true && selectedpiece.name.slice(0,6) == 'w_pawn') || (event.target.hasAttribute('w_enpassant') == true && selectedpiece.name.slice(0,6) == 'b_pawn')) && potentialtile == true){
+            //for some reason I need to set these back to false before the piece is moved but I can't figure out/remember why
             chess.properties.w_check = false;
             chess.properties.b_check = false;
+
+            chess.methods.capture(target);
+            chess.methods.endturn();
+        }
+
+        //if there already is a selected piece but not a piece on the target square we want to run our move method
+        else if(chess.properties.selectedpiece != '' && target.name == 'null' && potentialtile == true){
+            //for some reason I need to set these back to false before the piece is moved but I can't figure out/remember why
+            chess.properties.w_check = false;
+            chess.properties.b_check = false;
+            
             chess.methods.move(target);
             chess.methods.endturn();
         }
+
         //if the user clicks on a square that is not a potential tile to jump to after selecting a piece this will stop highlighting all the squares and reset our selected piece data
         else if(potentialtile == false){
             chess.methods.togglehighlight(chess.properties.highlighted);
             chess.properties.highlighted.length = 0;
             chess.properties.selectedpiece = '';
-        }
-        //here we are checking if we have already selected a piece, the target's name is a piece and if it is a potential tile to jump to before capturing
-        else if(chess.properties.selectedpiece != '' && (target.name != 'null' || event.target.hasAttribute('b_enpassant') == true || event.target.hasAttribute('w_enpassant') == true) && potentialtile == true){
-            chess.properties.w_check = false;
-            chess.properties.b_check = false;
-            chess.methods.capture(target);
-            chess.methods.endturn();
         }
     })
 })
