@@ -1249,8 +1249,9 @@ tileclicks.forEach((tile) => {
         if(chess.properties.selectedpiece == '' && target.name.slice(0,1) == chess.properties.turn){
             //we also need to set the selectedpiece as the now clicked on piece before running the testMove method
             chess.properties.selectedpiece = event.target.id;
-            //this is a workaround for pinning, the testMove function automatically makes the check properties true at the end so we are testing all the moves to see if the consequences of that move loses our king
-            chess.methods.testMove(chess.methods.moveoptions(event.target.getAttribute('chesspiece')));
+            //this is a workaround for pinning, the check properties being true forces the moveoptions function to check if moving endangers the king
+            chess.properties.b_check = true;
+            chess.properties.w_check = true;
 
             //the check properties will be true at all times except when being run by the testMove function since the testMove function above sets it to true at the end
             chess.methods.moveoptions(event.target.getAttribute('chesspiece'));
