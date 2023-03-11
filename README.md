@@ -3,7 +3,7 @@
 A rudimentary version of chess where you can play against yourself or an enemy locally.
 ## Getting Started: 
 Welcome to the classic game of Chess! Using the game link provided you will be able to play against either yourself or a friend locally. You can find an in-depth guide at how the various pieces move and the rules for the game [here](https://www.wikihow.com/Play-Chess-for-Beginners).
-![alt text] (https://i.imgur.com/UUF6iYH.png)
+<img src="https://i.imgur.com/UUF6iYH.png">
 ## User Stories
 ### MVP Goals:
 1. Create the 8x8 tile game board and a start button upon launch.
