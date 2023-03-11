@@ -9,6 +9,8 @@ let chess = {
         potentialBlackMoves: [],
         futureWhiteMoves: [],
         futureBlackMoves: [],
+        whiteDrawCheck: [],
+        blackDrawCheck: [],
         w_check: false,
         b_check: false,
         w_EnPassant: 0,
@@ -1001,12 +1003,12 @@ let chess = {
             //here I am implimenting a checkmate check for white
             //allDefense arrays store the potential moves you have to respond to a check threat, if the length is 0 checkmate will occur
             let allWhiteDefense = [];
+            let potentialWhiteDraw = [];
             for(let item of allTiles){
                 if(item.getAttribute('chesspiece').slice(0,1) == 'w'){
                     chess.properties.selectedpiece = item.getAttribute('id');
                     //this conditional checks the array that is updated at the end of every turn above
                     if(chess.properties.potentialBlackMoves.includes(chess.properties.pieces['w_king'].position) == true){
-                        chess.properties.w_check = true;
                         //here is where we are overriding the display text to say check
                         let displayText = document.querySelector('#turn');
                         displayText.innerText = "Check! White's turn";
@@ -1021,8 +1023,29 @@ let chess = {
                             allWhiteDefense.push(item);
                         }
                     }
+                    //here I am implimenting a stalemate check/output
+                     if(chess.properties.turn === 'w'){
+                        //we then need to check to see if you have any potential moves
+                        chess.properties.w_check = true;
+                        if(chess.methods.testMove(chess.methods.moveoptions(item.getAttribute('chesspiece'))).length == 0){
+    
+                        }
+                        //if you do then it will be pushed into this array to counter my checkmate conditional
+                        else{
+                            potentialWhiteDraw.push(item);
+                        }
+                    }
                 }
             }
+
+            //stalemate conditional
+            if(chess.properties.turn == 'w'){
+                if(potentialWhiteDraw.length == 0){
+                    let displayText = document.querySelector('#turn');
+                    displayText.innerText = "Stalemate! It's a Draw";
+                }
+            }
+
             //checkmate conditional
             if(allWhiteDefense.length == 0 && chess.properties.potentialBlackMoves.includes(chess.properties.pieces['w_king'].position) == true){
                 let displayText = document.querySelector('#turn');
@@ -1031,6 +1054,7 @@ let chess = {
 
             //here I am doing the same as above but for black
             let allBlackDefense = [];
+            let potentialBlackDraw = [];
             for(let item of allTiles){
                 if(item.getAttribute('chesspiece').slice(0,1) == 'b'){
                     chess.properties.selectedpiece = item.getAttribute('id');
@@ -1047,11 +1071,44 @@ let chess = {
                             allBlackDefense.push(item);
                         }
                     }
+
+                    //here I am implimenting a stalemate check/output
+                    if(chess.properties.turn === 'b'){
+                        //we then need to check to see if you have any potential moves
+                        chess.properties.b_check = true;
+                        if(chess.methods.testMove(chess.methods.moveoptions(item.getAttribute('chesspiece'))).length == 0){
+
+                        }
+                        //if you do then it will be pushed into this array to counter my checkmate conditional
+                        else{
+                            potentialBlackDraw.push(item);
+                        }
+                    }
                 }
             }
+            //checkmate conditional
             if(allBlackDefense.length == 0 && chess.properties.potentialWhiteMoves.includes(chess.properties.pieces['b_king'].position) == true){
                 let displayText = document.querySelector('#turn');
                 displayText.innerText = "Checkmate! White Wins!";
+            }
+            //stalemate conditional
+            if(chess.properties.turn == 'b'){
+                if(potentialBlackDraw.length == 0){
+                    let displayText = document.querySelector('#turn');
+                    displayText.innerText = "Stalemate! It's a Draw";
+                }
+            }
+            //lack of material draw conditional
+            let numberOfPieces = [];
+            for(let tile of allTiles){
+                if(tile.getAttribute('chesspiece').slice(0,1) == 'b' || tile.getAttribute('chesspiece').slice(0,1) == 'w'){
+                    numberOfPieces.push(tile);
+                }
+            }
+            
+            if(numberOfPieces.length == 2){
+                let displayText = document.querySelector('#turn');
+                displayText.innerText = "Lack of Material! It's a Draw";
             }
 
             //finally make sure to reset the selected piece
@@ -1062,8 +1119,6 @@ let chess = {
         testMove(potentialtile){
 
             //here we initialize our future pieces and their results as well as the validMoves array where we will return moves that meet the conditions
-            let whitePiecesArray = [];
-            let blackPiecesArray = [];
             let potentialWhiteResult = [];
             let potentialBlackResult = [];
             let validMoves = [];
